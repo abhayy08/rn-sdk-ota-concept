@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SDK_AS_MODULE</string>
+    <string moduleConfig="true" name="CodePushServerUrl">http://10.0.2.2:3000</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">22z61JKZGTwFnjVPIhZgG8TIh9p5NJ9bpQnsme</string>
 </resources>
