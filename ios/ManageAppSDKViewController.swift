@@ -4,14 +4,15 @@ import CodePush
 
 class ManageAppSDKViewController: UIViewController {
 
-    private var accessToken: String?
+    private var initialProps: [String: String]
 
-    init(accessToken: String?) {
-        self.accessToken = accessToken
+    init(initialProps: [String: String]) {
+        self.initialProps = initialProps
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
+        self.initialProps = [:]
         super.init(coder: coder)
     }
 
@@ -20,15 +21,14 @@ class ManageAppSDKViewController: UIViewController {
 
         let jsCodeLocation = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle")
 
-        // ✅ Explicitly create RCTBridge
         let bridge = RCTBridge(bundleURL: jsCodeLocation, moduleProvider: nil, launchOptions: nil)
+
+        NSLog("ManageAppSDK Props: \(initialProps)")
 
         let rootView = RCTRootView(
             bridge: bridge!,
             moduleName: "ManageAppSDK",
-            initialProperties: [
-                "accessToken": accessToken ?? ""
-            ]
+            initialProperties: initialProps
         )
 
         self.view = rootView
