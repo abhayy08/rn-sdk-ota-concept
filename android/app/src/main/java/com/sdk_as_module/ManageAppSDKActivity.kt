@@ -2,6 +2,7 @@ package com.sdk_as_module
 
 import android.app.Application
 import android.os.Bundle
+import androidx.annotation.Nullable
 import com.facebook.react.PackageList
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
