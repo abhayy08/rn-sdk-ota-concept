@@ -22,13 +22,33 @@ class ManageAppSDKActivity: ReactActivity() {
             fabricEnabled
         ) {
 
+//            override fun getLaunchOptions(): Bundle {
+//                val initialProps = Bundle()
+//
+//                intent?.getStringExtra("accessToken")?.let {
+//                    android.util.Log.d("ManageAppSDK", "accessToken received: $it")
+//                    initialProps.putString("accessToken", it)
+//                } ?: android.util.Log.d("ManageAppSDK", "accessToken is NULL or not found in intent")
+//
+//                return initialProps
+//            }
+
             override fun getLaunchOptions(): Bundle {
                 val initialProps = Bundle()
 
-                intent?.getStringExtra("accessToken")?.let {
-                    android.util.Log.d("ManageAppSDK", "accessToken received: $it")
-                    initialProps.putString("accessToken", it)
-                } ?: android.util.Log.d("ManageAppSDK", "accessToken is NULL or not found in intent")
+                intent?.extras?.let { bundle ->
+                    for (key in bundle.keySet()) {
+                        val value = bundle.get(key)
+                        when (value) {
+                            is String -> initialProps.putString(key, value)
+                            is Boolean -> initialProps.putBoolean(key, value)
+                            is Double -> initialProps.putDouble(key, value)
+                            is Int -> initialProps.putInt(key, value)
+                        }
+
+                        android.util.Log.d("ManageAppSDK", "Prop -> $key: $value")
+                    }
+                }
 
                 return initialProps
             }
