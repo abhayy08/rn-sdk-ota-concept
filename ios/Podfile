@@ -5,8 +5,13 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+
+# set min version to 15.5
+platform :ios, 15.5
 prepare_react_native_project!
+
+#  disable new arch
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -16,6 +21,9 @@ end
 
 target 'SDK_AS_MODULE' do
   config = use_native_modules!
+
+  # add this line
+  pod 'CodePush', :path => '../node_modules/react-native-code-push', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],

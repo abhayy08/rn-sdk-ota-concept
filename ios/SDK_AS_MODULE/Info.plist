@@ -4,6 +4,10 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CodePushDeploymentKey</key>
+	<string>1nXzztnx0Gjrb-_nH21XzyfPisjiNJ9bpQnsme</string>
+	<key>CodePushServerURL</key>
+	<string>http://localhost:3000</string>
 	<key>CFBundleDisplayName</key>
 	<string>SDK_AS_MODULE</string>
 	<key>CFBundleExecutable</key>
