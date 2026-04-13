@@ -12,6 +12,14 @@ class ReactActivityModule(private val reactContext: ReactApplicationContext)
     @ReactMethod
     fun launchManageAppSDK(params: ReadableMap) {
         val activity = reactContext.currentActivity ?: return
+        val app = activity.application as MainApplication
+
+        Log.d("SDK_DEBUG", "launchManageAppSDK called — isResetting: ${app.isResetting}")
+
+        if (app.isResetting) {
+            Log.d("SDK_DEBUG", "Launch blocked — SDK is resetting")
+            return
+        }
 
         val intent = Intent(activity, ManageAppSDKActivity::class.java)
 

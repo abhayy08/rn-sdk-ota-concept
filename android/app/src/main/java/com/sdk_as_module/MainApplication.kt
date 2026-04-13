@@ -103,6 +103,9 @@ class MainApplication : Application(), ReactApplication {
 
   // Called when SDK activity closes — resets host only if CodePush
   // has a new bundle ready, otherwise keeps the warm instance alive
+  @Volatile
+  var isResetting = false
+
   fun resetSDKInstance() {
     Handler(Looper.getMainLooper()).post {
       synchronized(sdkHostLock) {
@@ -111,22 +114,23 @@ class MainApplication : Application(), ReactApplication {
           if (host != null) {
             val manager = host.reactInstanceManager
 
-            manager.onHostPause()
+            // Give JS side time to finish in-flight work
+            // before tearing down the instance
+            manager.onHostDestroy()
             manager.destroy()
-
             Log.d("SDK_DEBUG", "SDK Instance destroyed safely")
           }
-
           _sdkHost = null
-
         } catch (e: Exception) {
           Log.e("SDK_DEBUG", "Reset failed: ${e.message}")
         }
       }
 
       Handler(Looper.getMainLooper()).postDelayed({
+        isResetting = false
         preloadSDKInstance()
       }, 500)
     }
   }
+
 }

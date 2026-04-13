@@ -47,7 +47,10 @@ class ManageAppSDKActivity : ReactActivity() {
     // Guarantees sdkHost is non-null and context is warming before launch
     private fun ensureSDKHostReady() {
         val app = application as MainApplication
-        val host = app.sdkHost // getter always returns non-null
+
+        // If a reset is in progress, _sdkHost may be null for ~500ms.
+        // sdkHost getter will synchronously create a new one if needed.
+        val host = app.sdkHost
         try {
             if (!host.reactInstanceManager.hasStartedCreatingInitialContext()) {
                 Log.d("SDK_DEBUG", "Host cold on launch — starting context now")
@@ -87,7 +90,18 @@ class ManageAppSDKActivity : ReactActivity() {
         }
     }
 
+    override fun onPause() {
+        (application as MainApplication).isResetting = true
+        super.onPause()
+    }
+
     override fun onDestroy() {
+        try {
+            reactDelegate?.onHostDestroy()
+        } catch (e: Exception) {
+            Log.e("SDK_DEBUG", "delegate onHostDestroy failed: ${e.message}")
+        }
+
         super.onDestroy()
         // Reset SDK host on close so CodePush updates are picked up on next launch
         (application as MainApplication).resetSDKInstance()
