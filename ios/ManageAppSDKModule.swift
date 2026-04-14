@@ -2,8 +2,8 @@ import Foundation
 import React
 import UIKit
 
-@objc(ReactActivityModule)
-class ReactActivityModule: NSObject {
+@objc(ManageAppSDKModule)
+class ManageAppSDKModule: NSObject {
 
     @objc
     func launchManageAppSDK(_ params: NSDictionary) {

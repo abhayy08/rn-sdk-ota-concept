@@ -12,9 +12,9 @@
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C853D4DB2F8759E500E09346 /* ManageAppSDKViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C853D4DA2F8759E500E09346 /* ManageAppSDKViewController.swift */; };
-		C853D4DD2F8759FF00E09346 /* ReactActivityModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C853D4DC2F8759FF00E09346 /* ReactActivityModule.swift */; };
+		C853D4DD2F8759FF00E09346 /* ManageAppSDKModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C853D4DC2F8759FF00E09346 /* ManageAppSDKModule.swift */; };
 		C853D4E02F875B6E00E09346 /* sdk.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = C853D4DF2F875B6E00E09346 /* sdk.jsbundle */; };
-		C853D4E22F87706D00E09346 /* ReactActivityModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = C853D4DE2F875A0A00E09346 /* ReactActivityModuleBridge.m */; };
+		C853D4E22F87706D00E09346 /* ManageAppSDKModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = C853D4DE2F875A0A00E09346 /* ManageAppSDKModuleBridge.m */; };
 		EAD3364B7193619E38B76D86 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -29,8 +29,8 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = SDK_AS_MODULE/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = SDK_AS_MODULE/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C853D4DA2F8759E500E09346 /* ManageAppSDKViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageAppSDKViewController.swift; sourceTree = "<group>"; };
-		C853D4DC2F8759FF00E09346 /* ReactActivityModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactActivityModule.swift; sourceTree = "<group>"; };
-		C853D4DE2F875A0A00E09346 /* ReactActivityModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ReactActivityModuleBridge.m; sourceTree = "<group>"; };
+		C853D4DC2F8759FF00E09346 /* ManageAppSDKModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageAppSDKModule.swift; sourceTree = "<group>"; };
+		C853D4DE2F875A0A00E09346 /* ManageAppSDKModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ManageAppSDKModuleBridge.m; sourceTree = "<group>"; };
 		C853D4DF2F875B6E00E09346 /* sdk.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = sdk.jsbundle; sourceTree = "<group>"; };
 		C853D4E12F8769D000E09346 /* SDK_AS_MODULE-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SDK_AS_MODULE-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -51,8 +51,8 @@
 		13B07FAE1A68108700A75B9A /* SDK_AS_MODULE */ = {
 			isa = PBXGroup;
 			children = (
-				C853D4DE2F875A0A00E09346 /* ReactActivityModuleBridge.m */,
-				C853D4DC2F8759FF00E09346 /* ReactActivityModule.swift */,
+				C853D4DE2F875A0A00E09346 /* ManageAppSDKModuleBridge.m */,
+				C853D4DC2F8759FF00E09346 /* ManageAppSDKModule.swift */,
 				C853D4DA2F8759E500E09346 /* ManageAppSDKViewController.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
@@ -270,8 +270,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				C853D4DB2F8759E500E09346 /* ManageAppSDKViewController.swift in Sources */,
-				C853D4E22F87706D00E09346 /* ReactActivityModuleBridge.m in Sources */,
-				C853D4DD2F8759FF00E09346 /* ReactActivityModule.swift in Sources */,
+				C853D4E22F87706D00E09346 /* ManageAppSDKModuleBridge.m in Sources */,
+				C853D4DD2F8759FF00E09346 /* ManageAppSDKModule.swift in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

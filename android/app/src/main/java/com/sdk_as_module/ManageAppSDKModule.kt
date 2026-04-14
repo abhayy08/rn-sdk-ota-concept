@@ -4,20 +4,18 @@ import android.content.Intent
 import android.util.Log
 import com.facebook.react.bridge.*
 
-class ReactActivityModule(private val reactContext: ReactApplicationContext)
+class ManageAppSDKModule(private val reactContext: ReactApplicationContext)
     : ReactContextBaseJavaModule(reactContext) {
 
-    override fun getName() = "ReactActivityModule"
+    override fun getName() = "ManageAppSDKModule"
 
     @ReactMethod
     fun launchManageAppSDK(params: ReadableMap) {
         val activity = reactContext.currentActivity ?: return
         val app = activity.application as MainApplication
 
-        Log.d("SDK_DEBUG", "launchManageAppSDK called — isResetting: ${app.isResetting}")
-
         if (app.isResetting) {
-            Log.d("SDK_DEBUG", "Launch blocked — SDK is resetting")
+            Log.d("MANAGE APP SDK", "Launch blocked — SDK is resetting")
             return
         }
 
@@ -32,43 +30,41 @@ class ReactActivityModule(private val reactContext: ReactApplicationContext)
                 ReadableType.String -> {
                     val value = params.getString(key)
                     intent.putExtra(key, value)
-                    Log.d("SDK_DEBUG", "$key: $value")
+                    Log.d("MANAGE APP SDK", "$key: $value")
                 }
 
                 ReadableType.Boolean -> {
                     val value = params.getBoolean(key)
                     intent.putExtra(key, value)
-                    Log.d("SDK_DEBUG", "$key: $value")
+                    Log.d("MANAGE APP SDK", "$key: $value")
                 }
 
                 ReadableType.Number -> {
                     val value = params.getDouble(key)
                     intent.putExtra(key, value)
-                    Log.d("SDK_DEBUG", "$key: $value")
+                    Log.d("MANAGE APP SDK", "$key: $value")
                 }
 
                 ReadableType.Map -> {
                     val value = params.getMap(key)?.toHashMap().toString()
                     intent.putExtra(key, value)
-                    Log.d("SDK_DEBUG", "$key: $value")
+                    Log.d("MANAGE APP SDK", "$key: $value")
                 }
 
                 ReadableType.Array -> {
                     val value = params.getArray(key)?.toString()
                     intent.putExtra(key, value)
-                    Log.d("SDK_DEBUG", "$key: $value")
+                    Log.d("MANAGE APP SDK", "$key: $value")
                 }
 
                 ReadableType.Null -> {
                     intent.putExtra(key, "null")
-                    Log.d("SDK_DEBUG", "$key: null")
+                    Log.d("MANAGE APP SDK", "$key: null")
                 }
 
                 else -> {}
-
             }
         }
-
         activity.startActivity(intent)
     }
 

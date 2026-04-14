@@ -2,13 +2,13 @@ import { NativeModules, StyleSheet, Text, View, Button, TouchableOpacity } from 
 import React, { useState } from "react";
 import CodePush from "react-native-code-push";
 
-const { ReactActivityModule } = NativeModules;
+const { ManageAppSDKModule } = NativeModules;
 
 const App = () => {
   const [count, setCount] = useState(0);
 
   const launchManageAppSDK = () => {
-    ReactActivityModule?.launchManageAppSDK({
+    ManageAppSDKModule?.launchManageAppSDK({
       accessToken:
         "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0MDU3MTEzMTM2MTc3NTcxNzU0MDIzNyIsImV4cCI6MTc3NTcxNzY2MCwidG9rZW5VdWlkIjoiNDA1NzExMzEzNjE3NzU3MTc1NDAyMzciLCJjb212aXZhQWNjb3VudElkIjoiNDA1NzExMzEzNiIsImFub255bW91c0lkIjoiIiwic3Vic2NyaWJlcklkIjoiIiwibWl4cGFuZWxJZCI6IkJJTkdFLThhMWY4MzhmOTJlYjQ5NTA4Y2VkNGQ1Y2Q5MTZlYTVlIiwicm1uIjoiOTQ4NTc2OTg0NyIsImFnZW50SWQiOiJudWxsIiwiYWdlbnRUeXBlIjoiIiwidXNlclR5cGUiOiJOb24gRFRIIFVzZXIiLCJwbGF0Zm9ybSI6IldFQiIsImR0aFN0YXR1cyI6Im51bGwiLCJkZXZpY2VJZCI6IjE3NjY0NjQyNjIwNzYiLCJhbmFseXRpY1NvdXJjZSI6IkhhbWJ1cmdlci1TdWJzY3JpYmUtQ1RBIiwicmV0dXJuVXJsIjoiaHR0cHM6Ly9zdGFnaW5nLXdlYi1mcm0udmlkZW9yZWFkeS50di8_dGlja1RpY2s9dHJ1ZSIsImJpbmdlQWNjb3VudElkIjoiNjExMTI4NTQzNyIsInNvdXJjZSI6IkJJTkdFX09UVCIsImpvdXJuZXlTb3VyY2UiOiJEUkFXRVIjQ1lPUCIsImpvdXJuZXlTb3VyY2VSZWZsZCI6IiIsInByb21vQ29kZSI6Im51bGwiLCJ2b3VjaGVyQ29kZSI6Im51bGwiLCJ1dGNUaW1lc3RhbXAiOiIxNzc1NzE3NTQwMjM3IiwiYXBwc0ZseWVyIjoie1wiYXBwc2ZseWVySWRcIjpcIjlhZGZjNDg3LTk3MDgtNDczYy1iYTk0LWE5NDU5MWYwNzRkOS1wXCIsXCJhZHZlcnRpc2luZ0lkXCI6XCI0MDU3MTEzMTM2XCIsXCJjdXN0b21lclVzZXJJZFwiOlwibnVsbFwiLFwiYXBwVmVyc2lvbk5hbWVcIjpcIlwiLFwib3NcIjpcIlwiLFwiaXBcIjpcIm51bGxcIixcImV2ZW50Q3VycmVuY3lcIjpcIm51bGxcIlwiZGV2aWNlXCI6XCJXRUJcIn0iLCJiaW5nZUFueXdoZXJlIjpmYWxzZSwib3JpZ2luIjoiRFJBV0VSI0NZT1AiLCJhcHBsaWVkQ291cG9uRGV0YWlscyI6IiIsImRpc2FibGVXYWxsZXQiOiIiLCJ0b2tlblR5cGUiOiJhY2Nlc3NUb2tlbiIsInplcm9BcHBTb3VyY2UiOiJudWxsIiwiY29udGVudE5hbWUiOiJudWxsIiwiY2FydEluZm8iOmZhbHNlLCJyZWZlcnJhbFNvdXJjZSI6IiIsImFkZGl0aW9uYWxJbmZvIjoiIn0.QNa_dGtmQkARW4MW_F5amIZV8KiIdZlzzsfCLuFr-65w8odsfkoZCOK_kv8gUCvfTsJe0K1T57rGDQ1RnAs3Mg",
       obj1: 123,
@@ -18,7 +18,7 @@ const App = () => {
       obj5: 1.2,
     });
     console.log("NATIVE MODULES NativeModules: ", NativeModules);
-    console.log("NATIVE MODULES ReactActivityModule: ", ReactActivityModule);
+    console.log("NATIVE MODULES ReactActivityModule: ", ManageAppSDKModule);
   };
 
   CodePush.notifyAppReady();
