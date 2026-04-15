@@ -6172,6 +6172,11 @@ react-native-screens@4.18.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-stallion@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-stallion/-/react-native-stallion-2.3.2.tgz#23b6e21f3191a5e8f1090df35a90abe7987aa354"
+  integrity sha512-DSs9wAPqPuQkLWsoh38923m0wDhaugdX1nqTp9OpTeibtSb9sKgAkgZk/NSq4ogIInfjdMMvAsyKzJKMgmmbeg==
+
 react-native-svg@15.11.2:
   version "15.11.2"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-15.11.2.tgz#7540e8e1eabc4dcd3b1e35ada5a1d9f1b96d37c4"

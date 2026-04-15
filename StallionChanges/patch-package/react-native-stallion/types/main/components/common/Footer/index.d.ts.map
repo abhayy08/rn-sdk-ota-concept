@@ -1,0 +1,1 @@
+{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../../../../../src/main/components/common/Footer/index.tsx"],"names":[],"mappings":"AAAA,OAAO,KAA4B,MAAM,OAAO,CAAC;AAYjD,UAAU,OAAO;IACf,UAAU,CAAC,EAAE,OAAO,CAAC;IACrB,cAAc,CAAC,EAAE,CAAC,eAAe,EAAE,OAAO,KAAK,IAAI,CAAC;IACpD,YAAY,CAAC,EAAE,MAAM,GAAG,IAAI,CAAC;IAC7B,iBAAiB,CAAC,EAAE,OAAO,CAAC;CAC7B;;AAyFD,wBAA4B"}

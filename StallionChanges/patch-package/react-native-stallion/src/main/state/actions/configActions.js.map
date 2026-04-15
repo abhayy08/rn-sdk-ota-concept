@@ -1,0 +1,1 @@
+{"version":3,"names":["ConfigActionKind","setConfig","newConfig","type","SET_CONFIG","payload"],"sourceRoot":"../../../../../src","sources":["main/state/actions/configActions.ts"],"mappings":"AAAA,SAGEA,gBAAgB,QACX,6BAA6B;AAEpC,OAAO,MAAMC,SAAS,GAAIC,SAA8B,IAAoB;EAC1E,OAAO;IACLC,IAAI,EAAEH,gBAAgB,CAACI,UAAU;IACjCC,OAAO,EAAEH;EACX,CAAC;AACH,CAAC"}

@@ -14,7 +14,9 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
-import com.microsoft.codepush.react.CodePush
+import com.stallion.Stallion
+
+//import com.microsoft.codepush.react.CodePush
 
 class MainApplication : Application(), ReactApplication {
 
@@ -39,8 +41,10 @@ class MainApplication : Application(), ReactApplication {
           add(ManageAppSDKPackage())
         }
 
-      override fun getJSBundleFile(): String? =
-        CodePush.getJSBundleFile("sdk.android.bundle")
+//      override fun getJSBundleFile(): String? =
+//        CodePush.getJSBundleFile("sdk.android.bundle")
+      override fun getJSBundleFile(): String? = Stallion.getJSBundleFile(this@MainApplication, "assets://sdk.android.bundle")
+
 
       override fun getBundleAssetName(): String = "sdk.android.bundle"
       override fun getJSMainModuleName(): String = "index"

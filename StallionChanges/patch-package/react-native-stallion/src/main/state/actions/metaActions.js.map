@@ -1,0 +1,1 @@
+{"version":3,"names":["MetaActionKind","setMeta","newMeta","type","SET_META","payload"],"sourceRoot":"../../../../../src","sources":["main/state/actions/metaActions.ts"],"mappings":"AAAA,SAGEA,cAAc,QACT,2BAA2B;AAElC,OAAO,MAAMC,OAAO,GAAIC,OAAsB,IAAkB;EAC9D,OAAO;IACLC,IAAI,EAAEH,cAAc,CAACI,QAAQ;IAC7BC,OAAO,EAAEH;EACX,CAAC;AACH,CAAC"}

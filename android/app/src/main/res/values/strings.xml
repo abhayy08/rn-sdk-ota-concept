@@ -2,4 +2,6 @@
     <string name="app_name">SDK_AS_MODULE</string>
     <string moduleConfig="true" name="CodePushServerUrl">http://10.0.2.2:3000</string>
     <string moduleConfig="true" name="CodePushDeploymentKey">22z61JKZGTwFnjVPIhZgG8TIh9p5NJ9bpQnsme</string>
+    <string name="StallionProjectId">69df00bc364e7afe13b7a8d3</string>
+    <string name="StallionAppToken">spb_61Ow5Ccl7DaJCOZa0vQ_d1jXGG1_Wi_pu71faPluiB</string>
 </resources>

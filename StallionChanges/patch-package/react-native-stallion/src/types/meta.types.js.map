@@ -1,0 +1,1 @@
+{"version":3,"names":["SWITCH_STATES","SLOT_STATES","MetaActionKind"],"sourceRoot":"../../../src","sources":["types/meta.types.ts"],"mappings":"AAAA,WAAYA,aAAa,0BAAbA,aAAa;EAAbA,aAAa;EAAbA,aAAa;EAAA,OAAbA,aAAa;AAAA;AAKzB,WAAYC,WAAW,0BAAXA,WAAW;EAAXA,WAAW;EAAXA,WAAW;EAAXA,WAAW;EAAA,OAAXA,WAAW;AAAA;AAmBvB,WAAYC,cAAc,0BAAdA,cAAc;EAAdA,cAAc;EAAdA,cAAc;EAAA,OAAdA,cAAc;AAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"names":["NativeModules","STALLION_DISABLED_ERROR","StallionNativeModule","Stallion"],"sourceRoot":"../../src","sources":["StallionNativeModule.ts"],"mappings":"AAAA,SAASA,aAAa,QAAQ,cAAc;AAE5C,OAAO,MAAMC,uBAAuB,GAClC,yIAAyI;AAE3I,MAAMC,oBAAoB,GAAGF,aAAa,CAACG,QAAQ;AAEnD,eAAeD,oBAAoB"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"useApiClient.d.ts","sourceRoot":"","sources":["../../../../src/main/utils/useApiClient.ts"],"names":[],"mappings":"AACA,OAAO,EAAgB,SAAS,EAAE,MAAM,2BAA2B,CAAC;AACpE,OAAO,EAAE,mBAAmB,EAAE,MAAM,0BAA0B,CAAC;AAE/D,KAAK,YAAY,GAAG,CAAC,aAAa,EAAE,OAAO,KAAK,IAAI,CAAC;AAErD,eAAO,MAAM,YAAY,gBACV,mBAAmB,gBAClB,YAAY;uBAGd,SAAS,WAAW,MAAM,KAAG,QAAQ,GAAG,CAAC;CAyBtD,CAAC"}
