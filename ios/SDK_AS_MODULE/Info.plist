@@ -26,6 +26,10 @@
 	<string>1nXzztnx0Gjrb-_nH21XzyfPisjiNJ9bpQnsme</string>
 	<key>CodePushServerURL</key>
 	<string>http://10.1.208.71:3000</string>
+	<key>StallionProjectId</key>
+  <string>69df00bc364e7afe13b7a8d3</string>
+	<key>StallionAppToken</key>
+  <string>spb_61Ow5Ccl7DaJCOZa0vQ_d1jXGG1_Wi_pu71faPluiB</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

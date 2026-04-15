@@ -1,6 +1,7 @@
 import UIKit
 import React
 import CodePush
+import react_native_stallion
 
 class ManageAppSDKViewController: UIViewController {
 
@@ -19,7 +20,8 @@ class ManageAppSDKViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let jsCodeLocation = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle")
+//        let jsCodeLocation = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle")
+        let jsCodeLocation = StallionModule.getBundleURL(Bundle.main.url(forResource: "sdk", withExtension: "jsbundle"))
 
         let bridge = RCTBridge(bundleURL: jsCodeLocation, moduleProvider: nil, launchOptions: nil)
 
