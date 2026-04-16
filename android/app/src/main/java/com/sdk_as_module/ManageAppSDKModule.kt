@@ -14,10 +14,10 @@ class ManageAppSDKModule(private val reactContext: ReactApplicationContext)
         val activity = reactContext.currentActivity ?: return
         val app = activity.application as MainApplication
 
-//        if (app.isResetting) {
-//            Log.d("MANAGE APP SDK", "Launch blocked — SDK is resetting")
-//            return
-//        }
+        if (app.isResetting) {
+            Log.d("MANAGE APP SDK", "Launch blocked — SDK is resetting")
+            return
+        }
 
         val intent = Intent(activity, ManageAppSDKActivity::class.java)
 

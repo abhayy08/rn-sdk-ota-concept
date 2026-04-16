@@ -113,7 +113,6 @@ class MainApplication : Application(), ReactApplication {
 
     fun resetSDKInstance() {
 
-        return
         Handler(Looper.getMainLooper()).post {
             synchronized(sdkHostLock) {
                 try {
