@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
+import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeHost
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
 import com.facebook.react.defaults.DefaultReactActivityDelegate
@@ -30,33 +31,32 @@ class ManageAppSDKActivity : ReactActivity() {
         (window.decorView as? ViewGroup)?.addView(mask)
 
         ensureSDKHostReady()
-
         super.onCreate(savedInstanceState)
 
-        // Fade out mask once RN has rendered
         mask.postDelayed({
             mask.animate()
                 .alpha(0f)
                 .setDuration(400)
-                .withEndAction {
-                    (mask.parent as? ViewGroup)?.removeView(mask)
-                }
+                .withEndAction { (mask.parent as? ViewGroup)?.removeView(mask) }
                 .start()
         }, 500)
     }
-    // Guarantees sdkHost is non-null and context is warming before launch
+
     private fun ensureSDKHostReady() {
         val app = application as MainApplication
-
-        // If a reset is in progress, _sdkHost may be null for ~500ms.
-        // sdkHost getter will synchronously create a new one if needed.
-        val host = app.sdkHost
         try {
-            if (!host.reactInstanceManager.hasStartedCreatingInitialContext()) {
-                Log.d("SDK_DEBUG", "Host cold on launch — starting context now")
-                host.reactInstanceManager.createReactContextInBackground()
+            if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+                // sdkReactHost getter guarantees a fresh valid host
+                app.sdkReactHost.start()
+                Log.d("SDK_DEBUG", "ReactHost.start() called on launch (New Arch)")
             } else {
-                Log.d("SDK_DEBUG", "Host already warm — fast launch")
+                val host = app.sdkHost
+                if (!host.reactInstanceManager.hasStartedCreatingInitialContext()) {
+                    Log.d("SDK_DEBUG", "Host cold on launch — starting context now")
+                    host.reactInstanceManager.createReactContextInBackground()
+                } else {
+                    Log.d("SDK_DEBUG", "Host already warm — fast launch")
+                }
             }
         } catch (e: Exception) {
             Log.e("SDK_DEBUG", "ensureSDKHostReady failed: ${e.message}")
@@ -66,9 +66,13 @@ class ManageAppSDKActivity : ReactActivity() {
     override fun createReactActivityDelegate(): ReactActivityDelegate {
         return object : DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled) {
 
-            // Always pull from MainApplication — guaranteed non-null
             override fun getReactNativeHost(): ReactNativeHost {
                 return (application as MainApplication).sdkHost
+            }
+
+            override fun getReactHost(): ReactHost {
+                // Always returns the current valid host (never stale)
+                return (application as MainApplication).sdkReactHost
             }
 
             override fun getLaunchOptions(): Bundle {
@@ -96,6 +100,7 @@ class ManageAppSDKActivity : ReactActivity() {
     }
 
     override fun onDestroy() {
+        // 1. Let the delegate clean up the surface first
         try {
             reactDelegate?.onHostDestroy()
         } catch (e: Exception) {
@@ -103,7 +108,9 @@ class ManageAppSDKActivity : ReactActivity() {
         }
 
         super.onDestroy()
-        // Reset SDK host on close so CodePush updates are picked up on next launch
+
+        // 2. Trigger reset AFTER super.onDestroy
+        // This ensures the Fabric Surface is detached before we wipe the JS engine
         (application as MainApplication).resetSDKInstance()
     }
 }
