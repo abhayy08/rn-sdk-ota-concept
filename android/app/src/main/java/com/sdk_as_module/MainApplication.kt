@@ -112,17 +112,13 @@ class MainApplication : Application(), ReactApplication {
     @Volatile var isResetting = false
 
     fun resetSDKInstance() {
-
         Handler(Looper.getMainLooper()).post {
             synchronized(sdkHostLock) {
                 try {
                     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-                        // NEW ARCH: Use reload instead of destroy
-                        // This clears JS state and re-runs the bundle safely
-                        _sdkReactHost?.reload("Resetting SDK Instance")
-                        Log.d("SDK_DEBUG", "SDK ReactHost reloaded (New Arch)")
+                        _sdkReactHost?.destroy("Resetting SDK Instance", null)
+                        Log.d("SDK_DEBUG", "SDK ReactHost destroyed (New Arch)")
                     } else {
-                        // OLD ARCH: Keep your existing destruction logic
                         _sdkHost?.reactInstanceManager?.let {
                             it.onHostDestroy()
                             it.destroy()
@@ -137,7 +133,6 @@ class MainApplication : Application(), ReactApplication {
                 }
             }
 
-            // For Old Arch, we trigger a fresh preload
             if (!BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     isResetting = false
