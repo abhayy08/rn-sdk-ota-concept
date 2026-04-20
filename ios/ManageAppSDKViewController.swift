@@ -87,7 +87,7 @@ class ManageAppSDKViewController: UIViewController {
         ) {
             sdkView.frame = self.view.bounds
             sdkView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            self.view.addSubview(sdkView)
+            self.view = sdkView
         }
         #endif
     }
@@ -100,6 +100,6 @@ class ManageAppSDKViewController: UIViewController {
         let rootView = RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
         rootView.frame = self.view.bounds
         rootView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.view.addSubview(rootView)
+        self.view = rootView
     }
 }
