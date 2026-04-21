@@ -15,6 +15,7 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 import com.stallion.Stallion
+import android.content.Context
 
 class MainApplication : Application(), ReactApplication {
 
@@ -28,7 +29,8 @@ class MainApplication : Application(), ReactApplication {
             _sdkHost ?: createSdkHost().also {
                 _sdkHost = it
                 // Always create sdkReactHost together with sdkHost
-                _sdkReactHost = getDefaultReactHost(applicationContext, it)
+//                _sdkReactHost = getDefaultReactHost(applicationContext, it)
+                _sdkReactHost = createSdkReactHost(applicationContext, it)
                 Log.d("SDK_DEBUG", "SDK host + reactHost created")
             }
         }
@@ -59,6 +61,14 @@ class MainApplication : Application(), ReactApplication {
         }
     }
 
+    private fun createSdkReactHost(context: Context, host: ReactNativeHost): ReactHost {
+        return getDefaultReactHost(
+            context,
+            host
+        )
+    }
+
+
     override val reactNativeHost: ReactNativeHost = object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
@@ -75,6 +85,7 @@ class MainApplication : Application(), ReactApplication {
 
     override fun onCreate() {
         super.onCreate()
+
         SoLoader.init(this, OpenSourceMergedSoMapping)
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             load()
