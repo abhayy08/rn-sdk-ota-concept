@@ -1,97 +1,189 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Dynamic SDK Integration (OTA + Multi-Bundle Architecture)
 
-# Getting Started
+## Overview
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+This repository demonstrates an **architecture pattern for integrating a React Native SDK into a host application using dynamic JavaScript bundle loading and OTA updates**.
 
-## Step 1: Start Metro
+It presents a modern alternative to the commonly used **WebView-based feature delivery**, enabling:
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- Native rendering (no WebView overhead)
+- Better performance
+- Modular feature rollout
+- OTA (Over-the-Air) updates support
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## Problem Statement
 
-# OR using Yarn
-yarn start
+In many apps (e.g., OTT platforms), certain screens like **pack pages, offers, or promotional flows** change frequently.
+
+### Traditional Approach
+
+- Implement these screens using a **WebView**
+- Load UI/web-app from a remote server
+
+### Limitations of WebView
+
+- Performance bottlenecks
+- Limited access to native capabilities
+- Inconsistent UI/UX
+- Harder debugging and state management
+
+---
+
+## Proposed Solution
+
+This project replaces the WebView approach with a **React Native multi-bundle architecture**, where:
+
+- The **host app** loads its main bundle
+- A **secondary React Native bundle (SDK)** is dynamically loaded at runtime
+
+This SDK acts like a **mini app inside the parent app**, enabling independent development and updates.
+
+---
+
+## Architecture
+
+### Bundles
+
+| Type       | Android Bundle Name    | iOS Bundle Name |
+| ---------- | ---------------------- | --------------- |
+| Host App   | `index.android.bundle` | `main.jsbundle` |
+| SDK Bundle | `sdk.android.bundle`   | `sdk.jsbundle`  |
+
+### Flow
+
+1. Host app initializes normally
+2. When required, it dynamically loads the **SDK bundle**
+3. SDK renders its own React Native screens
+4. OTA updates can update SDK independently of the host app
+
+---
+
+## Key Features
+
+- 🔹 Dynamic loading of secondary React Native bundle
+- 🔹 No WebView dependency
+- 🔹 Fully native UI rendering
+- 🔹 OTA update support
+- 🔹 Modular feature delivery
+- 🔹 Scalable architecture for large apps
+
+---
+
+## OTA Update Support
+
+This repo includes integration with:
+
+### 1. CodePush
+
+- Works with **React Native Old Architecture only**
+- Limited support for newer versions
+
+### 2. React Native Stallion
+
+- Works with **both Old and New Architecture**
+- Recommended for future-proof implementation
+- May require adjustments for newer React Native versions
+
+---
+
+## React Native Version
+
+```
+0.78.0
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Why This Approach?
 
-### Android
+| Feature            | WebView Approach | Multi-Bundle RN Approach       |
+| ------------------ | ---------------- | ------------------------------ |
+| Performance        | ❌ Slower        | ✅ Native speed                |
+| UI Consistency     | ❌ Inconsistent  | ✅ Fully native (React native) |
+| OTA Updates        | ✅ Yes           | ✅ Yes                         |
+| Native Integration | ❌ Limited       | ✅ Full access                 |
+| Debugging          | ❌ Hard          | ✅ Easier                      |
 
-```sh
-# Using npm
-npm run android
+---
 
-# OR using Yarn
-yarn android
+## Use Cases
+
+- Frequently changing product pages
+- Feature flags & experiments
+- Marketing campaigns
+- OTT dynamic content pages
+- Micro-frontend architecture in mobile apps
+
+---
+
+## Implementation Notes
+
+- The SDK bundle is treated as a **self-contained React Native module**
+
+- Communication between host and SDK can be handled via:
+
+  - Native modules (The SDK is launched through Native Modules)
+  - Event emitters
+  - Props/state injection
+
+- Bundle loading is platform-specific:
+
+  - Android: asset or file system loading
+  - iOS: bundled or downloaded JS bundle execution
+
+---
+
+## Limitations
+
+- Increased complexity compared to WebView
+- Requires careful version compatibility management
+- OTA strategy must be well planned
+- New architecture support may evolve with React Native updates
+
+---
+
+## Future Improvements
+
+- Better tooling for bundle splitting
+- Version synchronization between host and SDK
+- Improved debugging support
+- CI/CD pipeline for SDK bundle deployment
+
+---
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies
+
+   ```
+   npm install
+   ```
+
+3. Run the host app
+
+   ```
+   npx react-native run-android
+   npx react-native run-ios
+   ```
+
+4. Trigger SDK bundle loading from the app
+
+```
+const { ManageAppSDKModule } = NativeModules
+ManageAppSDKModule?.launchManageAppSDK()
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Conclusion
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+This architecture provides a **scalable and performant alternative to WebView-based feature delivery**, leveraging the full power of React Native while enabling **independent deployment and rapid iteration**.
 
-```sh
-bundle install
-```
+---
 
-Then, and every time you update your native dependencies, run:
+## License
 
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+MIT
