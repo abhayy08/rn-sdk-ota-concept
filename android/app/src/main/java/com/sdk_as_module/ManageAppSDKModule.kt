@@ -12,9 +12,8 @@ class ManageAppSDKModule(private val reactContext: ReactApplicationContext)
     @ReactMethod
     fun launchManageAppSDK(params: ReadableMap) {
         val activity = reactContext.currentActivity ?: return
-        val app = activity.application as MainApplication
 
-        if (app.isResetting) {
+        if (ManageAppSDKActivity.isResetting) {
             Log.d("MANAGE APP SDK", "Launch blocked — SDK is resetting")
             return
         }
@@ -71,5 +70,21 @@ class ManageAppSDKModule(private val reactContext: ReactApplicationContext)
     @ReactMethod
     fun closeManageAppSDK() {
         reactContext.currentActivity?.finish()
+    }
+
+
+    /*
+    * This preloads the SDK before launching it
+    * You can call this function to preload the SDK if the launching of SDK takes a bit of time,
+    * */
+    @ReactMethod
+    fun preloadManageAppSDKInstance() {
+        if (ManageAppSDKActivity.isResetting) {
+            Log.d("MANAGE APP SDK", "Preloading blocked — SDK is resetting")
+            return
+        }else {
+            Log.d("MANAGE APP SDK", "Preloading")
+            ManageAppSDKActivity.preloadSDKInstance(reactContext)
+        }
     }
 }

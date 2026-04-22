@@ -36,6 +36,7 @@ const App = () => {
       </View>
 
       <Button title="Launch SDK" onPress={launchManageAppSDK} />
+      <Button title="Preload SDK Instance" onPress={() => ManageAppSDKModule?.preloadManageAppSDKInstance()} />
     </View>
   );
 };
