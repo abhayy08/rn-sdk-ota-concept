@@ -171,10 +171,16 @@ This repo includes integration with:
 
 4. Trigger SDK bundle loading from the app
 
-```
-const { ManageAppSDKModule } = NativeModules
-ManageAppSDKModule?.launchManageAppSDK()
-```
+   ```
+   const { ManageAppSDKModule } = NativeModules
+   ManageAppSDKModule?.launchManageAppSDK()
+   / *
+   * Use ManageAppSDKModule?.preloadSDKInstance() in case the SDK is taking some time to launch and show up
+   * What this method would do, is it would load the sdk's ReactNativeHost and ReactHost before launching the SDK
+   * so when launchManageAppSDK() is called, these instances are already created, which would result in these instances
+   * not being created at the time of launch of the SDK (There may or may not be much differene in launch timing of the * SDK)
+   */
+   ```
 
 ---
 
