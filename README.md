@@ -98,13 +98,13 @@ This repo includes integration with:
 
 ## Why This Approach?
 
-| Feature            | WebView Approach | Multi-Bundle RN Approach |
-| ------------------ | ---------------- | ------------------------ |
-| Performance        | ❌ Slower        | ✅ Native speed          |
-| UI Consistency     | ❌ Inconsistent  | ✅ Fully native          |
-| OTA Updates        | ✅ Yes           | ✅ Yes                   |
-| Native Integration | ❌ Limited       | ✅ Full access           |
-| Debugging          | ❌ Hard          | ✅ Easier                |
+| Feature            | WebView Approach | Multi-Bundle RN Approach       |
+| ------------------ | ---------------- | ------------------------------ |
+| Performance        | ❌ Slower        | ✅ Native speed                |
+| UI Consistency     | ❌ Inconsistent  | ✅ Fully native (React native) |
+| OTA Updates        | ✅ Yes           | ✅ Yes                         |
+| Native Integration | ❌ Limited       | ✅ Full access                 |
+| Debugging          | ❌ Hard          | ✅ Easier                      |
 
 ---
 
@@ -170,6 +170,11 @@ This repo includes integration with:
    ```
 
 4. Trigger SDK bundle loading from the app
+
+```
+const { ManageAppSDKModule } = NativeModules
+ManageAppSDKModule?.launchManageAppSDK()
+```
 
 ---
 
