@@ -1,3 +1,4 @@
+// @file:OptIn(UnstableReactNativeAPI::class)
 package com.sdk_as_module
 
 import android.app.Application
@@ -16,6 +17,14 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 import com.stallion.Stallion
 import android.content.Context
+import com.facebook.react.runtime.ReactHostImpl
+import com.facebook.react.runtime.hermes.HermesInstance
+import com.facebook.react.runtime.JSCInstance
+import com.facebook.react.bridge.JSBundleLoader
+import com.facebook.react.defaults.DefaultReactHostDelegate
+import com.facebook.react.defaults.DefaultTurboModuleManagerDelegate
+import com.facebook.react.defaults.DefaultComponentsRegistry
+import com.facebook.react.fabric.ComponentFactory
 
 class MainApplication : Application(), ReactApplication {
 
@@ -30,7 +39,7 @@ class MainApplication : Application(), ReactApplication {
                 _sdkHost = it
                 // Always create sdkReactHost together with sdkHost
 //                _sdkReactHost = getDefaultReactHost(applicationContext, it)
-                _sdkReactHost = createSdkReactHost(applicationContext, it)
+                _sdkReactHost = createSdkReactHost(applicationContext)
                 Log.d("SDK_DEBUG", "SDK host + reactHost created")
             }
         }
@@ -61,12 +70,47 @@ class MainApplication : Application(), ReactApplication {
         }
     }
 
-    private fun createSdkReactHost(context: Context, host: ReactNativeHost): ReactHost {
-        return getDefaultReactHost(
-            context,
-            host
-        )
+    private fun createSdkReactHost(context: Context): ReactHost {
+    val stallionPath = Stallion.getJSBundleFile(this, "assets://sdk.android.bundle")
+
+    // ✅ Stallion returns a file path after update, asset path on first launch
+    val bundleLoader = when {
+        stallionPath == null || stallionPath.startsWith("assets://") -> {
+            JSBundleLoader.createAssetLoader(
+                context,
+                stallionPath ?: "assets://sdk.android.bundle",
+                true
+            )
+        }
+        else -> {
+            // Stallion has a downloaded bundle on disk
+            JSBundleLoader.createFileLoader(stallionPath)
+        }
     }
+
+    val jsRuntimeFactory = if (BuildConfig.IS_HERMES_ENABLED) HermesInstance() else JSCInstance()
+
+    val delegate = DefaultReactHostDelegate(
+        jsMainModulePath = "index",
+        jsBundleLoader = bundleLoader,
+        reactPackages = PackageList(reactNativeHost).packages.apply {
+            add(ManageAppSDKPackage())
+        },
+        jsRuntimeFactory = jsRuntimeFactory,
+        turboModuleManagerDelegateBuilder = DefaultTurboModuleManagerDelegate.Builder()
+    )
+
+    val componentFactory = ComponentFactory()
+    DefaultComponentsRegistry.register(componentFactory)
+
+    return ReactHostImpl(
+        context,
+        delegate,
+        componentFactory,
+        true,
+        false
+    )
+}
 
 
     override val reactNativeHost: ReactNativeHost = object : DefaultReactNativeHost(this) {
@@ -90,6 +134,8 @@ class MainApplication : Application(), ReactApplication {
         if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
             load()
         }
+
+        reactHost
         preloadSDKInstance()
     }
 
