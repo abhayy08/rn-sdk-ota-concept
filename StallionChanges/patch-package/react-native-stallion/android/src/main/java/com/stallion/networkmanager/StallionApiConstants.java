@@ -7,7 +7,7 @@ public class StallionApiConstants {
   // File and Folder Names
   public static final String ZIP_FILE_NAME = "build.zip";
   public static final String UNZIP_FOLDER_NAME = "/build";
-  public static final String ANDROID_BUNDLE_FILE_NAME = "/index.android.bundle";
+  public static final String ANDROID_BUNDLE_FILE_NAME = "/sdk.android.bundle";
 
   // Error Messages
   public static final String DOWNLOAD_ERROR_PREFIX = "Stallion download error: ";

@@ -1,4 +1,3 @@
-@file:OptIn(UnstableReactNativeAPI::class)
 package com.sdk_as_module
 
 import android.app.Application
@@ -76,6 +75,7 @@ class ManageAppSDKActivity : ReactActivity() {
             }
         }
 
+        @OptIn(UnstableReactNativeAPI::class)
         private fun createSdkReactHost(context: Context, sdkHost: ReactNativeHost): ReactHost {
             val stallionPath = Stallion.getJSBundleFile(
                 context.applicationContext,

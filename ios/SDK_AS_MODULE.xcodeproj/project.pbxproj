@@ -17,6 +17,11 @@
 		C8752C972F96693C00ECF21D /* assets in Resources */ = {isa = PBXBuildFile; fileRef = C8752C962F96693C00ECF21D /* assets */; };
 		CAE959B2583C6D21B1837F3C /* libPods-SDK_AS_MODULE.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E0B1238BC7F7DCA7EFB41424 /* libPods-SDK_AS_MODULE.a */; };
 		EAD3364B7193619E38B76D86 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		DE533A56BD3C475A8A947D4C /* VoltePlay-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 97BAAA5F9320486EB3048DE5 /* VoltePlay-SemiBold.ttf */; };
+		D2CA8A39AF02460BA5BE0D88 /* VoltePlay-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F745E8EFFD4B44DB807F4E58 /* VoltePlay-Light.ttf */; };
+		A8844B5455E94D65AF6974F0 /* VoltePlay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E8657D673C2F4988AE2A4F18 /* VoltePlay-Regular.ttf */; };
+		44FC309A796949A5BDEA7B83 /* VoltePlay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 01E428A2576442218DA917CF /* VoltePlay-Bold.ttf */; };
+		E9529A88C22D4C23964AC416 /* VoltePlay-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEAF0C149BA54D21809C30ED /* VoltePlay-Medium.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +41,11 @@
 		C8752C962F96693C00ECF21D /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		E0B1238BC7F7DCA7EFB41424 /* libPods-SDK_AS_MODULE.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SDK_AS_MODULE.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		97BAAA5F9320486EB3048DE5 /* VoltePlay-SemiBold.ttf */ = {isa = PBXFileReference; name = "VoltePlay-SemiBold.ttf"; path = "../node_modules/manage-app-sdk-bundles/fonts/VoltePlay-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F745E8EFFD4B44DB807F4E58 /* VoltePlay-Light.ttf */ = {isa = PBXFileReference; name = "VoltePlay-Light.ttf"; path = "../node_modules/manage-app-sdk-bundles/fonts/VoltePlay-Light.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		E8657D673C2F4988AE2A4F18 /* VoltePlay-Regular.ttf */ = {isa = PBXFileReference; name = "VoltePlay-Regular.ttf"; path = "../node_modules/manage-app-sdk-bundles/fonts/VoltePlay-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		01E428A2576442218DA917CF /* VoltePlay-Bold.ttf */ = {isa = PBXFileReference; name = "VoltePlay-Bold.ttf"; path = "../node_modules/manage-app-sdk-bundles/fonts/VoltePlay-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		BEAF0C149BA54D21809C30ED /* VoltePlay-Medium.ttf */ = {isa = PBXFileReference; name = "VoltePlay-Medium.ttf"; path = "../node_modules/manage-app-sdk-bundles/fonts/VoltePlay-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +102,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				CDE0D006481842BEA6D9D1E4 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -114,6 +125,19 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		CDE0D006481842BEA6D9D1E4 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				97BAAA5F9320486EB3048DE5 /* VoltePlay-SemiBold.ttf */,
+				F745E8EFFD4B44DB807F4E58 /* VoltePlay-Light.ttf */,
+				E8657D673C2F4988AE2A4F18 /* VoltePlay-Regular.ttf */,
+				01E428A2576442218DA917CF /* VoltePlay-Bold.ttf */,
+				BEAF0C149BA54D21809C30ED /* VoltePlay-Medium.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -180,6 +204,11 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				EAD3364B7193619E38B76D86 /* PrivacyInfo.xcprivacy in Resources */,
+				DE533A56BD3C475A8A947D4C /* VoltePlay-SemiBold.ttf in Resources */,
+				D2CA8A39AF02460BA5BE0D88 /* VoltePlay-Light.ttf in Resources */,
+				A8844B5455E94D65AF6974F0 /* VoltePlay-Regular.ttf in Resources */,
+				44FC309A796949A5BDEA7B83 /* VoltePlay-Bold.ttf in Resources */,
+				E9529A88C22D4C23964AC416 /* VoltePlay-Medium.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

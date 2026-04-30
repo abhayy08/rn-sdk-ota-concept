@@ -19,7 +19,7 @@ public class StallionConfigConstants {
   public static final String NEW_FOLDER_SLOT = "/StallionNew";
   public static final String STABLE_FOLDER_SLOT = "/StallionStable";
 
-  public static final String ANDROID_BUNDLE_FILE_NAME = "/index.android.bundle";
+  public static final String ANDROID_BUNDLE_FILE_NAME = "/sdk.android.bundle";
   public static final String DEFAULT_JS_BUNDLE_LOCATION_BASE = "assets:/";
   public static final String UNZIP_FOLDER_NAME = "/build";
 
