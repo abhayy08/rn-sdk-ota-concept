@@ -1,6 +1,6 @@
 import UIKit
 import React
-import react_native_stallion
+import CodePush
 
 #if RCT_NEW_ARCH_ENABLED
 import React_RCTAppDelegate
@@ -50,9 +50,8 @@ class ManageAppSDKViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let jsCodeLocation = StallionModule.getBundleURL(
-            Bundle.main.url(forResource: "sdk", withExtension: "jsbundle")
-        )
+      let jsCodeLocation = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle")
+      NSLog("SDK_DEBUG: BundlePath: \(String(describing: jsCodeLocation))")
 
         #if RCT_NEW_ARCH_ENABLED
             NSLog("SDK_DEBUG: Running on NEW Architecture (0.78.0 Factory)")

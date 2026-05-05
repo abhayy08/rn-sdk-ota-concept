@@ -1,4 +1,4 @@
-import { NativeModules, StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
+import { NativeModules, StyleSheet, Text, View, Button, TouchableOpacity, Platform } from "react-native";
 import React, { useState } from "react";
 import CodePush from "@revopush/react-native-code-push";
 
@@ -36,7 +36,7 @@ const App = () => {
       </View>
 
       <Button title="Launch SDK" onPress={launchManageAppSDK} />
-      <Button title="Preload SDK Instance" onPress={() => ManageAppSDKModule?.preloadManageAppSDKInstance()} />
+      <Button title="Preload SDK Instance" onPress={() => Platform.OS == "android" && ManageAppSDKModule?.preloadManageAppSDKInstance()} />
     </View>
   );
 };

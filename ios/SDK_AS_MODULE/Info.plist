@@ -22,10 +22,10 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>CodePushDeploymentKey</key>
-	<string>1nXzztnx0Gjrb-_nH21XzyfPisjiNJ9bpQnsme</string>
 	<key>CodePushServerURL</key>
-	<string>http://10.1.208.71:3000</string>
+	<string>https://api.revopush.org</string>
+	<key>CodePushDeploymentKey</key>
+	<string>gmmSr6TRUjc_gS6M4pjnPjMW1TqUEysSNhz0Xe</string>
 	<key>StallionProjectId</key>
 	<string>69df00bc364e7afe13b7a8d3</string>
 	<key>StallionAppToken</key>

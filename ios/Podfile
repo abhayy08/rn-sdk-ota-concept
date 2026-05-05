@@ -1,4 +1,4 @@
-ENV['RCT_NEW_ARCH_ENABLED'] = '1'
+ENV['RCT_NEW_ARCH_ENABLED'] = '0'
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -22,7 +22,7 @@ target 'SDK_AS_MODULE' do
   config = use_native_modules!
 
   # add this line
-  pod 'CodePush', :path => '../node_modules/react-native-code-push', :modular_headers => true
+  pod 'CodePush', :path => '../node_modules/@revopush/react-native-code-push', :modular_headers => true
 
   use_react_native!(
     :path => config[:reactNativePath],
