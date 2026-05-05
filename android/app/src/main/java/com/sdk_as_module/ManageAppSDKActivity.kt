@@ -25,7 +25,8 @@ import com.facebook.react.fabric.ComponentFactory
 import com.facebook.react.runtime.JSCInstance
 import com.facebook.react.runtime.ReactHostImpl
 import com.facebook.react.runtime.hermes.HermesInstance
-import com.stallion.Stallion
+// import com.stallion.Stallion
+import com.microsoft.codepush.react.CodePush 
 
 class ManageAppSDKActivity : ReactActivity() {
 
@@ -56,14 +57,10 @@ class ManageAppSDKActivity : ReactActivity() {
 
         private fun createSdkHost(context: Context): ReactNativeHost {
             return object : DefaultReactNativeHost(context.applicationContext as Application) {
+                override fun getPackages() = PackageList(this).packages.apply { add(ManageAppSDKPackage()) }
 
-                override fun getPackages() =
-                    PackageList(this).packages.apply { add(ManageAppSDKPackage()) }
-
-                // Stallion resolves to a downloaded file after OTA; falls back to
-                // the bundled asset on first run or when no update is available.
                 override fun getJSBundleFile(): String? =
-                    Stallion.getJSBundleFile(context.applicationContext, "assets://sdk.android.bundle")
+                    CodePush.getJSBundleFile("sdk.android.bundle")
 
                 override fun getBundleAssetName(): String = "sdk.android.bundle"
                 override fun getJSMainModuleName(): String = "index"
@@ -77,10 +74,12 @@ class ManageAppSDKActivity : ReactActivity() {
 
         @OptIn(UnstableReactNativeAPI::class)
         private fun createSdkReactHost(context: Context, sdkHost: ReactNativeHost): ReactHost {
-            val stallionPath = Stallion.getJSBundleFile(
-                context.applicationContext,
-                "assets://sdk.android.bundle"
-            )
+            // val stallionPath = Stallion.getJSBundleFile(
+            //     context.applicationContext,
+            //     "assets://sdk.android.bundle"
+            // )
+            val stallionPath = CodePush.getJSBundleFile("sdk.android.bundle")
+            Log.d("SDK_DEBUG_PATH", "${stallionPath}")
 
             // Choose the correct loader based on whether Stallion has a cached update.
             val bundleLoader = when {

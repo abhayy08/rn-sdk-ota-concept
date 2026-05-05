@@ -1845,6 +1845,19 @@
   dependencies:
     nanoid "^3.1.23"
 
+"@revopush/react-native-code-push@^1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@revopush/react-native-code-push/-/react-native-code-push-1.5.1.tgz#84e6faab7bf2f613060db811c9c5f890ef1d75da"
+  integrity sha512-ZShGFf2OYj860CBWWi/NMDs0rLUkzfsf8gatB9i/U8PBg30jlcD91NM56UxOp8JcCLUheM+IThgY1AuuqMnqpA==
+  dependencies:
+    code-push "4.2.3"
+    glob "^7.1.7"
+    hoist-non-react-statics "^3.3.2"
+    inquirer "^8.1.5"
+    plist "^3.0.4"
+    semver "^7.3.5"
+    xcode "3.0.1"
+
 "@sideway/address@^4.1.5":
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/@sideway/address/-/address-4.1.5.tgz#4bc149a0076623ced99ca8208ba780d65a99b9d5"
@@ -6103,19 +6116,6 @@ react-is@^19.0.0:
   version "19.2.4"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-19.2.4.tgz#a080758243c572ccd4a63386537654298c99d135"
   integrity sha512-W+EWGn2v0ApPKgKKCy/7s7WHXkboGcsrXE+2joLyVxkbyVQfO3MUEaUQDHoSmb8TFFrSKYa9mw64WZHNHSDzYA==
-
-react-native-code-push@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-code-push/-/react-native-code-push-9.0.1.tgz#6f70a49a6f11f63c8859a91dfe55dd7911f9fceb"
-  integrity sha512-+7BhJbsx0c9md2zCOPsEv44eKQsvDM7J5nVYFsDUHVzBx8cvojBSPfjfdqZq5op5YmawH7mpbIPMYUj9bF9SLw==
-  dependencies:
-    code-push "4.2.3"
-    glob "^7.1.7"
-    hoist-non-react-statics "^3.3.2"
-    inquirer "^8.1.5"
-    plist "^3.0.4"
-    semver "^7.3.5"
-    xcode "3.0.1"
 
 react-native-fast-image@8.6.3:
   version "8.6.3"

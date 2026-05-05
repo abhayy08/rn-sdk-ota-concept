@@ -1,6 +1,6 @@
 import { NativeModules, StyleSheet, Text, View, Button, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import CodePush from "react-native-code-push";
+import CodePush from "@revopush/react-native-code-push";
 
 const { ManageAppSDKModule } = NativeModules;
 
