@@ -25,8 +25,7 @@ import com.facebook.react.fabric.ComponentFactory
 import com.facebook.react.runtime.JSCInstance
 import com.facebook.react.runtime.ReactHostImpl
 import com.facebook.react.runtime.hermes.HermesInstance
-// import com.stallion.Stallion
-import com.microsoft.codepush.react.CodePush 
+import com.microsoft.codepush.react.CodePush
 
 class ManageAppSDKActivity : ReactActivity() {
 
@@ -74,25 +73,21 @@ class ManageAppSDKActivity : ReactActivity() {
 
         @OptIn(UnstableReactNativeAPI::class)
         private fun createSdkReactHost(context: Context, sdkHost: ReactNativeHost): ReactHost {
-            // val stallionPath = Stallion.getJSBundleFile(
-            //     context.applicationContext,
-            //     "assets://sdk.android.bundle"
-            // )
-            val stallionPath = CodePush.getJSBundleFile("sdk.android.bundle")
-            Log.d("SDK_DEBUG_PATH", "${stallionPath}")
+            val codepushPath = CodePush.getJSBundleFile("sdk.android.bundle")
+            Log.d("SDK_DEBUG_PATH", "${codepushPath}")
 
-            // Choose the correct loader based on whether Stallion has a cached update.
+            // Choose the correct loader based on whether Codepush has a cached update.
             val bundleLoader = when {
-                stallionPath == null || stallionPath.startsWith("assets://") ->
+                codepushPath == null || codepushPath.startsWith("assets://") ->
                     // No OTA update yet — serve the bundle that ships with the APK.
                     JSBundleLoader.createAssetLoader(
                         context.applicationContext,
-                        stallionPath ?: "assets://sdk.android.bundle",
+                        codepushPath ?: "assets://sdk.android.bundle",
                         true
                     )
                 else ->
-                    // OTA update downloaded — load Stallion's file from disk.
-                    JSBundleLoader.createFileLoader(stallionPath)
+                    // OTA update downloaded — load Codepush's file from disk.
+                    JSBundleLoader.createFileLoader(codepushPath)
             }
 
             // Choose between Hermes (default, recommended) and JSC at build time.
@@ -126,7 +121,7 @@ class ManageAppSDKActivity : ReactActivity() {
         fun preloadSDKInstance(context: Context) {
             Thread {
                 try {
-                    // Building the host pair may or mat not involve IO operation because of Stallion
+                    // Building the host pair may or mat not involve IO operation because of Codepush
                     // so we do this off the main thread
                     val host = getSdkHost(context)
 
