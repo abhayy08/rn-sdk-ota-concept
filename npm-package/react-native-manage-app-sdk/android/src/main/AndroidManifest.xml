@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This manifest is automatically merged into the host app's AndroidManifest.xml
+  by Android's manifest merger. No manual changes needed in the host app.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.manageappsdk">
+
+    <application>
+        <!--
+          ManageAppSDKActivity is declared here so the host app does NOT need to
+          add it manually. Android manifest merger handles this automatically.
+        -->
+        <activity
+            android:name=".ManageAppSDKActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false" />
+    </application>
+
+</manifest>

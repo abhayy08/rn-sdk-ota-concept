@@ -1,0 +1,46 @@
+buildscript {
+    ext.safeExtGet = { prop, fallback ->
+        rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 35)
+    buildToolsVersion safeExtGet('buildToolsVersion', '35.0.0')
+    namespace "com.manageappsdk"
+
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 24)
+        targetSdkVersion safeExtGet('targetSdkVersion', 35)
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+
+    // Required for @OptIn annotations used in the SDK
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    // react-native is provided by the host app — do not bundle it
+    implementation 'com.facebook.react:react-android:+'
+
+    // @revopush/react-native-code-push is NOT a Maven artifact.
+    // It is a local Android library module that RN autolinking registers as the
+    // Gradle project ':react-native-code-push' in every host app that has it installed.
+    // compileOnly means we reference its classes at compile time without bundling them —
+    // the host app's own copy provides them at runtime.
+    // compileOnly project(':react-native-code-push')
+}

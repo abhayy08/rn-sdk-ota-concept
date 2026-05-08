@@ -30,82 +30,52 @@ import com.microsoft.codepush.react.CodePush
 class ManageAppSDKActivity : ReactActivity() {
 
     companion object {
-
         @Volatile private var _sdkHost: ReactNativeHost? = null
         @Volatile private var _sdkReactHost: ReactHost? = null
-
         private val sdkHostLock = Any()
-
         @Volatile var isResetting = false
 
         fun getSdkHost(context: Context): ReactNativeHost =
             _sdkHost ?: synchronized(sdkHostLock) {
-                _sdkHost ?: createSdkHost(context).also { newHost ->
-                    _sdkHost = newHost
-                    // Always create the ReactHost alongside the ReactNativeHost
-                    // so both references are never stale relative to each other.
-                    _sdkReactHost = createSdkReactHost(context, newHost)
+                _sdkHost ?: createSdkHost(context).also {
+                    _sdkHost = it
+                    _sdkReactHost = createSdkReactHost(context, it)
                     Log.d("SDK_DEBUG", "SDK host + reactHost created")
                 }
             }
 
-        fun getSdkReactHost(context: Context): ReactHost {
-            getSdkHost(context) // ensures _sdkReactHost is set alongside _sdkHost
-            return _sdkReactHost!!
-        }
+        fun getSdkReactHost(context: Context): ReactHost =
+            getSdkHost(context).let { _sdkReactHost!! }
 
-        private fun createSdkHost(context: Context): ReactNativeHost {
-            return object : DefaultReactNativeHost(context.applicationContext as Application) {
+        private fun createSdkHost(context: Context): ReactNativeHost =
+            object : DefaultReactNativeHost(context.applicationContext as Application) {
                 override fun getPackages() = PackageList(this).packages.apply { add(ManageAppSDKPackage()) }
-
-                override fun getJSBundleFile(): String? =
-                    CodePush.getJSBundleFile("sdk.android.bundle")
-
+                override fun getJSBundleFile(): String? = CodePush.getJSBundleFile("sdk.android.bundle")
                 override fun getBundleAssetName(): String = "sdk.android.bundle"
                 override fun getJSMainModuleName(): String = "index"
-
                 override fun getUseDeveloperSupport(): Boolean = false
-
                 override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
-                override val isHermesEnabled: Boolean  = BuildConfig.IS_HERMES_ENABLED
+                override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
             }
-        }
 
         @OptIn(UnstableReactNativeAPI::class)
         private fun createSdkReactHost(context: Context, sdkHost: ReactNativeHost): ReactHost {
             val codepushPath = CodePush.getJSBundleFile("sdk.android.bundle")
-            Log.d("SDK_DEBUG_PATH", "${codepushPath}")
+            Log.d("SDK_DEBUG_PATH", "$codepushPath")
 
-            // Choose the correct loader based on whether Codepush has a cached update.
-            val bundleLoader = when {
-                codepushPath == null || codepushPath.startsWith("assets://") ->
-                    // No OTA update yet — serve the bundle that ships with the APK.
-                    JSBundleLoader.createAssetLoader(
-                        context.applicationContext,
-                        codepushPath ?: "assets://sdk.android.bundle",
-                        true
-                    )
-                else ->
-                    // OTA update downloaded — load Codepush's file from disk.
-                    JSBundleLoader.createFileLoader(codepushPath)
-            }
-
-            // Choose between Hermes (default, recommended) and JSC at build time.
-            val jsRuntimeFactory = if (BuildConfig.IS_HERMES_ENABLED) HermesInstance() else JSCInstance()
+            val bundleLoader = if (codepushPath == null || codepushPath.startsWith("assets://"))
+                JSBundleLoader.createAssetLoader(context.applicationContext, codepushPath ?: "assets://sdk.android.bundle", true)
+            else
+                JSBundleLoader.createFileLoader(codepushPath)
 
             val delegate = DefaultReactHostDelegate(
                 jsMainModulePath = "index",
                 jsBundleLoader = bundleLoader,
-                // Re-use the sdkHost to resolve auto-linked packages so this host
-                // and the Old Arch host always share the same package list.
-                reactPackages = PackageList(sdkHost).packages.apply {
-                    add(ManageAppSDKPackage())
-                },
-                jsRuntimeFactory = jsRuntimeFactory,
+                reactPackages = PackageList(sdkHost).packages.apply { add(ManageAppSDKPackage()) },
+                jsRuntimeFactory = if (BuildConfig.IS_HERMES_ENABLED) HermesInstance() else JSCInstance(),
                 turboModuleManagerDelegateBuilder = DefaultTurboModuleManagerDelegate.Builder()
             )
 
-            // Fabric components must be registered before ReactHostImpl is created.
             val componentFactory = ComponentFactory()
             DefaultComponentsRegistry.register(componentFactory)
 
@@ -113,38 +83,28 @@ class ManageAppSDKActivity : ReactActivity() {
                 context.applicationContext,
                 delegate,
                 componentFactory,
-                true,  // allowPackageManagerQueries
-                false  // useDevSupport — SDK is always a bundle not a dev server
+                true, false
             )
         }
 
         fun preloadSDKInstance(context: Context) {
             Thread {
                 try {
-                    // Building the host pair may or mat not involve IO operation because of Codepush
-                    // so we do this off the main thread
                     val host = getSdkHost(context)
-
                     Handler(Looper.getMainLooper()).post {
                         try {
                             if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
                                 _sdkReactHost?.start()
                                 Log.d("SDK_DEBUG", "SDK ReactHost.start() called (New Arch)")
+                            } else if (!host.reactInstanceManager.hasStartedCreatingInitialContext()) {
+                                host.reactInstanceManager.createReactContextInBackground()
+                                Log.d("SDK_DEBUG", "SDK context preload started (Old Arch)")
                             } else {
-                                if (!host.reactInstanceManager.hasStartedCreatingInitialContext()) {
-                                    host.reactInstanceManager.createReactContextInBackground()
-                                    Log.d("SDK_DEBUG", "SDK context preload started (Old Arch)")
-                                } else {
-                                    Log.d("SDK_DEBUG", "SDK context already warming/warm")
-                                }
+                                Log.d("SDK_DEBUG", "SDK context already warming/warm")
                             }
-                        } catch (e: Exception) {
-                            Log.e("SDK_DEBUG", "Preload post to main thread failed: ${e.message}")
-                        }
+                        } catch (e: Exception) { Log.e("SDK_DEBUG", "Preload post to main thread failed: ${e.message}") }
                     }
-                } catch (e: Exception) {
-                    Log.e("SDK_DEBUG", "SDK host creation failed during preload: ${e.message}")
-                }
+                } catch (e: Exception) { Log.e("SDK_DEBUG", "SDK host creation failed during preload: ${e.message}") }
             }.start()
         }
 
@@ -156,29 +116,18 @@ class ManageAppSDKActivity : ReactActivity() {
                             _sdkReactHost?.destroy("Resetting SDK Instance", null)
                             Log.d("SDK_DEBUG", "SDK ReactHost destroyed (New Arch)")
                         } else {
-                            _sdkHost?.reactInstanceManager?.let {
-                                it.onHostDestroy()
-                                it.destroy()
-                                Log.d("SDK_DEBUG", "SDK InstanceManager destroyed (Old Arch)")
-                            }
-                            // Null both so the next getSdkHost() rebuilds the pair from scratch.
+                            _sdkHost?.reactInstanceManager?.let { it.onHostDestroy(); it.destroy() }
+                            Log.d("SDK_DEBUG", "SDK InstanceManager destroyed (Old Arch)")
                             _sdkHost = null
                             _sdkReactHost = null
                         }
-                    } catch (e: Exception) {
-                        Log.e("SDK_DEBUG", "Reset failed: ${e.message}")
-                    }
+                    } catch (e: Exception) { Log.e("SDK_DEBUG", "Reset failed: ${e.message}") }
                 }
 
-                if (!BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-                    // Allow the old instance to fully wind down before starting a new one.
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        isResetting = false
-                        preloadSDKInstance(context)
-                    }, 500)
-                } else {
+                if (!BuildConfig.IS_NEW_ARCHITECTURE_ENABLED)
+                    Handler(Looper.getMainLooper()).postDelayed({ isResetting = false; preloadSDKInstance(context) }, 500)
+                else
                     isResetting = false
-                }
             }
         }
     }
@@ -187,20 +136,13 @@ class ManageAppSDKActivity : ReactActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar)
-
         val splashMask = buildSplashMask()
         (window.decorView as? ViewGroup)?.addView(splashMask)
-
         ensureSDKHostReady()
-
         super.onCreate(savedInstanceState)
-
         splashMask.postDelayed({
-            splashMask.animate()
-                .alpha(0f)
-                .setDuration(400)
-                .withEndAction { (splashMask.parent as? ViewGroup)?.removeView(splashMask) }
-                .start()
+            splashMask.animate().alpha(0f).setDuration(400)
+                .withEndAction { (splashMask.parent as? ViewGroup)?.removeView(splashMask) }.start()
         }, 500)
     }
 
@@ -228,54 +170,37 @@ class ManageAppSDKActivity : ReactActivity() {
             android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM,
             intArrayOf(0xFF340368.toInt(), 0xFF140128.toInt())
         )
-        layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
+        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
-
-    override fun createReactActivityDelegate(): ReactActivityDelegate {
-        return object : DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled) {
-
-            override fun getReactNativeHost(): ReactNativeHost =
-                getSdkHost(applicationContext)
-
-            override fun getReactHost(): ReactHost =
-                getSdkReactHost(applicationContext)
-
-            override fun getLaunchOptions(): Bundle {
-                val initialProps = Bundle()
+    override fun createReactActivityDelegate(): ReactActivityDelegate =
+        object : DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled) {
+            override fun getReactNativeHost(): ReactNativeHost = getSdkHost(applicationContext)
+            override fun getReactHost(): ReactHost = getSdkReactHost(applicationContext)
+            override fun getLaunchOptions(): Bundle = Bundle().also { props ->
                 intent?.extras?.let { bundle ->
                     for (key in bundle.keySet()) {
-                        when (val value = bundle.get(key)) {
-                            is String  -> initialProps.putString(key, value)
-                            is Boolean -> initialProps.putBoolean(key, value)
-                            is Double  -> initialProps.putDouble(key, value)
-                            is Int     -> initialProps.putInt(key, value)
+                        when (val v = bundle.get(key)) {
+                            is String  -> props.putString(key, v)
+                            is Boolean -> props.putBoolean(key, v)
+                            is Double  -> props.putDouble(key, v)
+                            is Int     -> props.putInt(key, v)
                         }
                         Log.d("ManageAppSDK", "Prop -> $key: ${bundle.get(key)}")
                     }
                 }
-                return initialProps
             }
         }
-    }
 
-    override fun onPause() {
-        isResetting = true
-        super.onPause()
-    }
+    override fun onPause() { isResetting = true; super.onPause() }
 
     override fun onDestroy() {
-        try {
-            reactDelegate?.onHostDestroy()
+        try { 
+            reactDelegate?.onHostDestroy() 
         } catch (e: Exception) {
             Log.e("SDK_DEBUG", "delegate onHostDestroy failed: ${e.message}")
         }
-
         super.onDestroy()
-
         resetSDKInstance(applicationContext)
     }
 }

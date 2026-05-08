@@ -1,0 +1,36 @@
+{
+  "name": "react-native-manage-app-sdk",
+  "version": "5.0.0",
+  "description": "ManageApp SDK for React Native — drop-in native module with CodePush support",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
+  "files": [
+    "android/",
+    "ios/",
+    "src/",
+    "react-native.config.js",
+    "react-native-manage-app-sdk.podspec",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "react-native",
+    "manage-app",
+    "sdk",
+    "android",
+    "ios"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "@revopush/react-native-code-push": "*"
+  },
+  "devDependencies": {
+    "typescript": "5.0.4",
+    "@types/react": "^19.0.0"
+  }
+}
