@@ -1,16 +1,34 @@
 import UIKit
 import React
 
-// ManageAppSDKViewController hosts an isolated React Native instance
-// loaded from sdk.jsbundle using RCTBridge.
+#if RCT_NEW_ARCH_ENABLED
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+#endif
+
+// MARK: - ManageAppSDKViewController
 //
-// RCTBridge is used on both Old Arch and New Arch host apps.
-// Creating a second RCTReactNativeFactory on New Arch crashes because
-// the TurboModule manager is a process-wide singleton.
-// RCTBridge runs in its own isolated context and does not conflict.
+// Core rule: ALWAYS reuse the host app's existing React Native bridge/host.
+//
+// Spinning up a second RCTReactNativeFactory or RCTBridge creates an isolated
+// TurboModule / NativeModule registry. Any native module registered by the
+// host app (Stallion, CodePush, etc.) will be missing from that registry,
+// causing an ObjC exception → std::terminate on the turbomodulemanager queue.
+//
+// Resolution order:
+//   1. New Arch  — host RCTAppDelegate.rootViewFactory (RN 0.74+)
+//   2. Old Arch  — RCTBridge.current() (works for both Old Arch and New Arch
+//                  bridge-compatibility mode)
+//   3. Fallback  — standalone instance (only if host has no React at all;
+//                  will crash if sdk.jsbundle uses host-registered modules)
 
 class ManageAppSDKViewController: UIViewController {
     private var initialProps: [String: String]
+
+    // Retain standalone factory so it isn't deallocated while the view is live.
+    #if RCT_NEW_ARCH_ENABLED
+    private var standaloneFactory: RCTReactNativeFactory?
+    #endif
 
     init(initialProps: [String: String]) {
         self.initialProps = initialProps
@@ -24,23 +42,63 @@ class ManageAppSDKViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        guard let bundleURL = ManageAppSDKViewController.resolveBundleURL() else {
-            NSLog("SDK_DEBUG: ERROR - sdk.jsbundle not found. Run pod install.")
-            return
-        }
-
-        NSLog("SDK_DEBUG: Resolved bundle: \(bundleURL)")
-
-        let bridge = RCTBridge(bundleURL: bundleURL, moduleProvider: nil, launchOptions: nil)!
         let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
-        let rootView = RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
-        rootView.frame = self.view.bounds
-        rootView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        self.view = rootView
+
+        if let sdkView = makeSDKView(props: props) {
+            sdkView.frame = view.bounds
+            sdkView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            view = sdkView
+        } else {
+            NSLog("SDK_DEBUG: ERROR — could not create SDK view. Check that sdk.jsbundle is bundled correctly.")
+        }
     }
 
-    // MARK: - Bundle URL resolution
+    // MARK: - View creation
+
+    private func makeSDKView(props: [String: Any]) -> UIView? {
+
+        // ── Path 1: New Arch — reuse host rootViewFactory ──────────────────
+        #if RCT_NEW_ARCH_ENABLED
+        if let appDelegate = UIApplication.shared.delegate as? RCTAppDelegate {
+            NSLog("SDK_DEBUG: [New Arch] Reusing host RCTAppDelegate.rootViewFactory.")
+            return appDelegate.rootViewFactory().view(
+                withModuleName: "ManageAppSDK",
+                initialProperties: props
+            )
+        }
+        NSLog("SDK_DEBUG: [New Arch] Host AppDelegate is not RCTAppDelegate.")
+        #endif
+
+        // ── Path 2: Reuse host RCTBridge (Old Arch & New Arch bridge-mode) ─
+        if let bridge = RCTBridge.current() {
+            NSLog("SDK_DEBUG: [Bridge] Reusing host RCTBridge.")
+            return RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
+        }
+        NSLog("SDK_DEBUG: No host bridge found — falling back to standalone instance.")
+
+        // ── Path 3: Standalone fallback ─────────────────────────────────────
+        // WARNING: This will crash at runtime if sdk.jsbundle calls any native
+        // module that is registered only in the host app (e.g. Stallion).
+        guard let bundleURL = ManageAppSDKViewController.resolveBundleURL() else {
+            NSLog("SDK_DEBUG: ERROR — sdk.jsbundle not found.")
+            return nil
+        }
+
+        #if RCT_NEW_ARCH_ENABLED
+        let delegate = SDKStandaloneDelegate(bundleURL: bundleURL)
+        delegate.dependencyProvider = RCTAppDependencyProvider()
+        let factory = RCTReactNativeFactory(delegate: delegate)
+        standaloneFactory = factory
+        NSLog("SDK_DEBUG: [Standalone/NewArch] Starting isolated React instance.")
+        return factory.rootViewFactory.view(withModuleName: "ManageAppSDK", initialProperties: props)
+        #else
+        NSLog("SDK_DEBUG: [Standalone/OldArch] Starting isolated React instance.")
+        let bridge = RCTBridge(bundleURL: bundleURL, moduleProvider: nil, launchOptions: nil)!
+        return RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
+        #endif
+    }
+
+    // MARK: - Bundle URL Resolution
 
     static func resolveBundleURL() -> URL? {
         // 1. CodePush OTA via ObjC runtime (no compile-time dependency)
@@ -59,7 +117,7 @@ class ManageAppSDKViewController: UIViewController {
             }
         }
 
-        // 2. Named resource bundle (resource_bundles in podspec)
+        // 2. Named resource bundle (podspec resource_bundles)
         if let podBundleURL = Bundle.main.url(forResource: "react-native-manage-app-sdk", withExtension: "bundle"),
            let podBundle = Bundle(url: podBundleURL),
            let url = podBundle.url(forResource: "sdk", withExtension: "jsbundle") {
@@ -73,7 +131,7 @@ class ManageAppSDKViewController: UIViewController {
             return url
         }
 
-        // 4. Filesystem search
+        // 4. Filesystem search fallback
         let mainBundlePath = Bundle.main.bundlePath
         if let enumerator = FileManager.default.enumerator(atPath: mainBundlePath) {
             for case let path as String in enumerator where path.hasSuffix("sdk.jsbundle") {
@@ -86,3 +144,19 @@ class ManageAppSDKViewController: UIViewController {
         return nil
     }
 }
+
+// MARK: - Standalone delegate (only used in last-resort path)
+
+#if RCT_NEW_ARCH_ENABLED
+private class SDKStandaloneDelegate: RCTDefaultReactNativeFactoryDelegate {
+    private let customBundleURL: URL?
+
+    init(bundleURL: URL?) {
+        self.customBundleURL = bundleURL
+        super.init()
+    }
+
+    override func bundleURL() -> URL? { customBundleURL }
+    override func sourceURL(for bridge: RCTBridge) -> URL? { bundleURL() }
+}
+#endif

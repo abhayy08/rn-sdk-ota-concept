@@ -18,25 +18,29 @@ class ManageAppSDKModule: NSObject {
                 }
             }
 
+            guard let rootVC = UIApplication.shared.connectedScenes
+                .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
+                .first?.rootViewController else {
+                NSLog("SDK_DEBUG: launchManageAppSDK — no root view controller found")
+                return
+            }
+
             let sdkVC = ManageAppSDKViewController(initialProps: finalProps)
             sdkVC.modalPresentationStyle = .fullScreen
-
-            if let rootVC = UIApplication.shared.connectedScenes
-                .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
-                .first?.rootViewController {
-                rootVC.present(sdkVC, animated: true, completion: nil)
-            }
+            rootVC.present(sdkVC, animated: true, completion: nil)
         }
     }
 
     @objc
     func closeManageAppSDK() {
         DispatchQueue.main.async {
-            if let rootVC = UIApplication.shared.connectedScenes
+            guard let rootVC = UIApplication.shared.connectedScenes
                 .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
-                .first?.rootViewController {
-                rootVC.presentedViewController?.dismiss(animated: true)
+                .first?.rootViewController else {
+                NSLog("SDK_DEBUG: closeManageAppSDK — no root view controller found")
+                return
             }
+            rootVC.presentedViewController?.dismiss(animated: true)
         }
     }
 
