@@ -1,6 +1,6 @@
 {
   "name": "react-native-manage-app-sdk",
-  "version": "6.0.0",
+  "version": "24.0.0",
   "description": "ManageApp SDK for React Native — drop-in native module with CodePush support",
   "main": "src/index.js",
   "types": "src/index.d.ts",

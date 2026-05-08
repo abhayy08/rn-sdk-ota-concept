@@ -9,7 +9,6 @@ class ManageAppSDKModule: NSObject {
     func launchManageAppSDK(_ params: NSDictionary) {
         DispatchQueue.main.async {
             var finalProps: [String: String] = [:]
-
             for (key, value) in params {
                 guard let keyStr = key as? String else { continue }
                 if value is NSNull {
@@ -17,7 +16,6 @@ class ManageAppSDKModule: NSObject {
                 } else {
                     finalProps[keyStr] = "\(value)"
                 }
-                NSLog("SDK_DEBUG \(keyStr): \(value)")
             }
 
             let sdkVC = ManageAppSDKViewController(initialProps: finalProps)
@@ -44,8 +42,6 @@ class ManageAppSDKModule: NSObject {
 
     @objc
     func preloadManageAppSDKInstance() {
-        // iOS preloading is a no-op for now.
-        // The bundle URL is resolved lazily on first launch.
         NSLog("SDK_DEBUG: preloadManageAppSDKInstance called (iOS no-op)")
     }
 
