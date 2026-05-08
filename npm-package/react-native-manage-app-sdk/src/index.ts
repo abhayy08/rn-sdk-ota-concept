@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-manage-app-sdk' doesn't seem to be linked. ` +
@@ -23,16 +23,13 @@ export type SDKParams = {
 
 /**
  * Launch the ManageApp SDK screen.
- * All key/value pairs in `params` are forwarded as Intent extras to the native Activity.
+ * All key/value pairs in `params` are forwarded as Intent extras (Android)
+ * or initial props (iOS).
  *
  * @example
  * launchManageAppSDK({ userId: 'abc123', theme: 'dark' });
  */
 export function launchManageAppSDK(params: SDKParams = {}): void {
-  if (Platform.OS !== 'android') {
-    console.warn('react-native-manage-app-sdk: launchManageAppSDK is Android-only for now.');
-    return;
-  }
   ManageAppSDKNativeModule.launchManageAppSDK(params);
 }
 
@@ -40,7 +37,6 @@ export function launchManageAppSDK(params: SDKParams = {}): void {
  * Close the ManageApp SDK screen and return to the host app.
  */
 export function closeManageAppSDK(): void {
-  if (Platform.OS !== 'android') return;
   ManageAppSDKNativeModule.closeManageAppSDK();
 }
 
@@ -48,11 +44,11 @@ export function closeManageAppSDK(): void {
  * Preload the SDK React instance in the background.
  * Call this early (e.g. in your App's useEffect on mount) to warm up the
  * SDK so that launchManageAppSDK opens instantly.
+ * On iOS this is currently a no-op.
  *
  * @example
  * useEffect(() => { preloadManageAppSDKInstance(); }, []);
  */
 export function preloadManageAppSDKInstance(): void {
-  if (Platform.OS !== 'android') return;
   ManageAppSDKNativeModule.preloadManageAppSDKInstance();
 }

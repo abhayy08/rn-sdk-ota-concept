@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const { NativeModules, Platform } = require('react-native');
+const { NativeModules, Platform } = require("react-native");
 
 const LINKING_ERROR =
   `The package 'react-native-manage-app-sdk' doesn't seem to be linked. ` +
@@ -16,18 +16,15 @@ const ManageAppSDKNativeModule = NativeModules.ManageAppSDKModule
         get() {
           throw new Error(LINKING_ERROR);
         },
-      }
+      },
     );
 
 /**
  * Launch the ManageApp SDK screen.
- * @param {Object} params - Key/value pairs forwarded as Intent extras to the native Activity.
+ * @param {Object} params - Key/value pairs forwarded as Intent extras (Android)
+ *                          or initial props (iOS).
  */
 function launchManageAppSDK(params = {}) {
-  if (Platform.OS !== 'android') {
-    console.warn('react-native-manage-app-sdk: launchManageAppSDK is Android-only for now.');
-    return;
-  }
   ManageAppSDKNativeModule.launchManageAppSDK(params);
 }
 
@@ -35,16 +32,19 @@ function launchManageAppSDK(params = {}) {
  * Close the ManageApp SDK screen and return to the host app.
  */
 function closeManageAppSDK() {
-  if (Platform.OS !== 'android') return;
   ManageAppSDKNativeModule.closeManageAppSDK();
 }
 
 /**
  * Preload the SDK React instance in the background.
  * Call this early (e.g. in your App's useEffect on mount).
+ * On iOS this is currently a no-op.
  */
 function preloadManageAppSDKInstance() {
-  if (Platform.OS !== 'android') return;
+  if (Platform.OS !== "android") {
+    console.warn("react-native-manage-app-sdk: preloadManageAppSDKInstance is Android-only for now.");
+    return;
+  }
   ManageAppSDKNativeModule.preloadManageAppSDKInstance();
 }
 
