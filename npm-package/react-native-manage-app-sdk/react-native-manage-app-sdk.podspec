@@ -35,6 +35,7 @@ Pod::Spec.new do |s|
   }
 
   s.dependency "React-Core"
+  s.dependency "CodePush"
   if new_arch_enabled
     s.dependency "React-RCTAppDelegate"
     s.dependency "ReactAppDependencyProvider"

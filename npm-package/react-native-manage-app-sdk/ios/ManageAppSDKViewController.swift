@@ -1,33 +1,41 @@
 import UIKit
 import React
+import CodePush
 
 #if RCT_NEW_ARCH_ENABLED
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 #endif
 
+// MARK: - New Arch Delegate
+
+#if RCT_NEW_ARCH_ENABLED
+class SDKReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+    private let customBundleURL: URL?
+
+    init(bundleURL: URL?) {
+        self.customBundleURL = bundleURL
+        super.init()
+    }
+
+    override func bundleURL() -> URL? {
+        return customBundleURL
+    }
+
+    override func sourceURL(for bridge: RCTBridge) -> URL? {
+        return self.bundleURL()
+    }
+}
+#endif
+
 // MARK: - ManageAppSDKViewController
-//
-// Core rule: ALWAYS reuse the host app's existing React Native bridge/host.
-//
-// Spinning up a second RCTReactNativeFactory or RCTBridge creates an isolated
-// TurboModule / NativeModule registry. Any native module registered by the
-// host app (Stallion, CodePush, etc.) will be missing from that registry,
-// causing an ObjC exception → std::terminate on the turbomodulemanager queue.
-//
-// Resolution order:
-//   1. New Arch  — host RCTAppDelegate.rootViewFactory (RN 0.74+)
-//   2. Old Arch  — RCTBridge.current() (works for both Old Arch and New Arch
-//                  bridge-compatibility mode)
-//   3. Fallback  — standalone instance (only if host has no React at all;
-//                  will crash if sdk.jsbundle uses host-registered modules)
 
 class ManageAppSDKViewController: UIViewController {
     private var initialProps: [String: String]
 
-    // Retain standalone factory so it isn't deallocated while the view is live.
     #if RCT_NEW_ARCH_ENABLED
-    private var standaloneFactory: RCTReactNativeFactory?
+    private var reactNativeFactory: RCTReactNativeFactory?
+    private var reactNativeDelegate: SDKReactNativeDelegate?
     #endif
 
     init(initialProps: [String: String]) {
@@ -42,79 +50,27 @@ class ManageAppSDKViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
 
-        if let sdkView = makeSDKView(props: props) {
-            sdkView.frame = view.bounds
-            sdkView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            view = sdkView
-        } else {
-            NSLog("SDK_DEBUG: ERROR — could not create SDK view. Check that sdk.jsbundle is bundled correctly.")
-        }
-    }
-
-    // MARK: - View creation
-
-    private func makeSDKView(props: [String: Any]) -> UIView? {
-
-        // ── Path 1: New Arch — reuse host rootViewFactory ──────────────────
-        #if RCT_NEW_ARCH_ENABLED
-        if let appDelegate = UIApplication.shared.delegate as? RCTAppDelegate {
-            NSLog("SDK_DEBUG: [New Arch] Reusing host RCTAppDelegate.rootViewFactory.")
-            return appDelegate.rootViewFactory().view(
-                withModuleName: "ManageAppSDK",
-                initialProperties: props
-            )
-        }
-        NSLog("SDK_DEBUG: [New Arch] Host AppDelegate is not RCTAppDelegate.")
-        #endif
-
-        // ── Path 2: Reuse host RCTBridge (Old Arch & New Arch bridge-mode) ─
-        if let bridge = RCTBridge.current() {
-            NSLog("SDK_DEBUG: [Bridge] Reusing host RCTBridge.")
-            return RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
-        }
-        NSLog("SDK_DEBUG: No host bridge found — falling back to standalone instance.")
-
-        // ── Path 3: Standalone fallback ─────────────────────────────────────
-        // WARNING: This will crash at runtime if sdk.jsbundle calls any native
-        // module that is registered only in the host app (e.g. Stallion).
-        guard let bundleURL = ManageAppSDKViewController.resolveBundleURL() else {
-            NSLog("SDK_DEBUG: ERROR — sdk.jsbundle not found.")
-            return nil
-        }
+        let jsCodeLocation = ManageAppSDKViewController.resolveBundleURL()
+        NSLog("SDK_DEBUG: BundlePath: \(String(describing: jsCodeLocation))")
 
         #if RCT_NEW_ARCH_ENABLED
-        let delegate = SDKStandaloneDelegate(bundleURL: bundleURL)
-        delegate.dependencyProvider = RCTAppDependencyProvider()
-        let factory = RCTReactNativeFactory(delegate: delegate)
-        standaloneFactory = factory
-        NSLog("SDK_DEBUG: [Standalone/NewArch] Starting isolated React instance.")
-        return factory.rootViewFactory.view(withModuleName: "ManageAppSDK", initialProperties: props)
+        NSLog("SDK_DEBUG: Running on NEW Architecture")
+        setupNewArchView(bundleURL: jsCodeLocation)
         #else
-        NSLog("SDK_DEBUG: [Standalone/OldArch] Starting isolated React instance.")
-        let bridge = RCTBridge(bundleURL: bundleURL, moduleProvider: nil, launchOptions: nil)!
-        return RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
+        NSLog("SDK_DEBUG: Running on OLD Architecture")
+        setupOldArchView(bundleURL: jsCodeLocation)
         #endif
     }
 
     // MARK: - Bundle URL Resolution
 
     static func resolveBundleURL() -> URL? {
-        // 1. CodePush OTA via ObjC runtime (no compile-time dependency)
-        if let codePushClass = NSClassFromString("CodePush") {
-            let selector = NSSelectorFromString("bundleURLForResource:withExtension:")
-            if codePushClass.responds(to: selector) {
-                typealias BundleURLFunc = @convention(c) (AnyClass, Selector, NSString, NSString) -> Unmanaged<AnyObject>?
-                if let imp = class_getMethodImplementation(object_getClass(codePushClass), selector) {
-                    let fn = unsafeBitCast(imp, to: BundleURLFunc.self)
-                    if let result = fn(codePushClass, selector, "sdk" as NSString, "jsbundle" as NSString),
-                       let url = result.takeUnretainedValue() as? URL {
-                        NSLog("SDK_DEBUG: Using CodePush bundle: \(url)")
-                        return url
-                    }
-                }
-            }
+        // 1. CodePush OTA bundle for "sdk" resource (only non-nil if an OTA
+        //    update has been downloaded for the SDK's own deployment key)
+        if let codePushURL = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle") {
+            NSLog("SDK_DEBUG: Using CodePush OTA bundle: \(codePushURL)")
+            return codePushURL
         }
 
         // 2. Named resource bundle (podspec resource_bundles)
@@ -143,20 +99,53 @@ class ManageAppSDKViewController: UIViewController {
 
         return nil
     }
-}
 
-// MARK: - Standalone delegate (only used in last-resort path)
+    // MARK: - New Architecture
 
-#if RCT_NEW_ARCH_ENABLED
-private class SDKStandaloneDelegate: RCTDefaultReactNativeFactoryDelegate {
-    private let customBundleURL: URL?
+    private func setupNewArchView(bundleURL: URL?) {
+        #if RCT_NEW_ARCH_ENABLED
+        guard let bundleURL = bundleURL else { return }
 
-    init(bundleURL: URL?) {
-        self.customBundleURL = bundleURL
-        super.init()
+        reactNativeDelegate = SDKReactNativeDelegate(bundleURL: bundleURL)
+
+        // Share the host app's dependency provider so all TurboModules
+        // registered by the host (gesture handler, SVG, CodePush, etc.)
+        // are available to the SDK's React instance.
+        if let appDelegate = UIApplication.shared.delegate as? RCTAppDelegate {
+            reactNativeDelegate?.dependencyProvider = appDelegate.dependencyProvider
+        }
+
+        reactNativeFactory = RCTReactNativeFactory(delegate: reactNativeDelegate!)
+
+        let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
+
+        // Install an ObjC exception handler to catch the exact module name
+        // that fails before std::terminate kills the process.
+        NSSetUncaughtExceptionHandler { exception in
+            NSLog("SDK_DEBUG: *** UNCAUGHT EXCEPTION: %@", exception.name.rawValue)
+            NSLog("SDK_DEBUG: *** REASON: %@", exception.reason ?? "nil")
+            NSLog("SDK_DEBUG: *** CALL STACK: %@", exception.callStackSymbols.joined(separator: "\n"))
+        }
+
+        let sdkView = reactNativeFactory!.rootViewFactory.view(
+            withModuleName: "ManageAppSDK",
+            initialProperties: props
+        )
+        sdkView.frame = self.view.bounds
+        sdkView.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
+        self.view = sdkView
+        #endif
     }
 
-    override func bundleURL() -> URL? { customBundleURL }
-    override func sourceURL(for bridge: RCTBridge) -> URL? { bundleURL() }
+    // MARK: - Old Architecture
+
+    private func setupOldArchView(bundleURL: URL?) {
+        guard let bundleURL = bundleURL else { return }
+        let bridge = RCTBridge(bundleURL: bundleURL, moduleProvider: nil, launchOptions: nil)!
+        let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
+        let rootView = RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
+        rootView.frame = self.view.bounds
+        rootView.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
+        self.view = rootView
+    }
 }
-#endif
