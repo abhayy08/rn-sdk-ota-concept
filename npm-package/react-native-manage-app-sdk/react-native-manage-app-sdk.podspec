@@ -24,8 +24,22 @@ Pod::Spec.new do |s|
   # from the app bundle, RN looks for assets/ next to the bundle file.
   s.resources = [
     'ios/sdk.jsbundle',
-    'ios/assets'
+    'ios/assets',
+    'ios/fonts/*.ttf'
   ]
+
+  # Register fonts with iOS so they are available to the SDK's RN instance.
+  # Without this entry in Info.plist, iOS won't load the font files even if
+  # they are present in the app bundle.
+  s.info_plist = {
+    'UIAppFonts' => [
+      'VoltePlay-Bold.ttf',
+      'VoltePlay-Light.ttf',
+      'VoltePlay-Medium.ttf',
+      'VoltePlay-Regular.ttf',
+      'VoltePlay-SemiBold.ttf'
+    ]
+  }
 
   s.pod_target_xcconfig = {
     "SWIFT_VERSION"      => "5.0",
@@ -34,6 +48,7 @@ Pod::Spec.new do |s|
 
   s.dependency "React-Core"
   s.dependency "CodePush"
+  s.dependency "RNFastImage"
 
   if new_arch_enabled
     s.dependency "React-RCTAppDelegate"
