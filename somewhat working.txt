@@ -1,0 +1,164 @@
+import UIKit
+import React
+import CodePush
+
+#if RCT_NEW_ARCH_ENABLED
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+#endif
+
+// MARK: - New Arch Delegate
+
+#if RCT_NEW_ARCH_ENABLED
+class SDKReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+    private let customBundleURL: URL?
+
+    init(bundleURL: URL?) {
+        self.customBundleURL = bundleURL
+        super.init()
+    }
+
+    override func bundleURL() -> URL? {
+        return customBundleURL
+    }
+
+    override func sourceURL(for bridge: RCTBridge) -> URL? {
+        return self.bundleURL()
+    }
+}
+#endif
+
+// MARK: - ManageAppSDKViewController
+
+class ManageAppSDKViewController: UIViewController {
+    private var initialProps: [String: String]
+
+    #if RCT_NEW_ARCH_ENABLED
+    private var reactNativeFactory: RCTReactNativeFactory?
+    private var reactNativeDelegate: SDKReactNativeDelegate?
+    #endif
+
+    init(initialProps: [String: String]) {
+        self.initialProps = initialProps
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        self.initialProps = [:]
+        super.init(coder: coder)
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        let jsCodeLocation = ManageAppSDKViewController.resolveBundleURL()
+        NSLog("SDK_DEBUG: BundlePath: \(String(describing: jsCodeLocation))")
+
+        #if RCT_NEW_ARCH_ENABLED
+        NSLog("SDK_DEBUG: Running on NEW Architecture")
+        setupNewArchView(bundleURL: jsCodeLocation)
+        #else
+        NSLog("SDK_DEBUG: Running on OLD Architecture")
+        setupOldArchView(bundleURL: jsCodeLocation)
+        #endif
+    }
+
+    // MARK: - Bundle URL Resolution
+
+    static func resolveBundleURL() -> URL? {
+        // sdk.jsbundle is copied directly into the app's main bundle via
+        // `s.resources` in the podspec (NOT resource_bundles).
+        // CodePush.bundleURL(forResource:withExtension:) searches [NSBundle mainBundle]
+        // and reads CodePushDeploymentKey from the parent app's Info.plist.
+        // Both conditions are now satisfied.
+
+        // Log what's actually in the main bundle so we can confirm the file is there.
+        let defaultPath = Bundle.main.path(forResource: "sdk", ofType: "jsbundle")
+        NSLog("SDK_DEBUG: sdk.jsbundle in mainBundle: \(defaultPath ?? "NOT FOUND — pod install needed")")
+
+        // CodePush returns:
+        //   - A downloaded update URL  → if an update was applied
+        //   - The default bundle URL   → on first launch / no update yet
+        //   - nil                      → only if the file is missing from mainBundle
+        let resolvedURL = CodePush.bundleURL(forResource: "sdk", withExtension: "jsbundle")
+        NSLog("SDK_DEBUG: CodePush resolved URL: \(String(describing: resolvedURL?.path))")
+
+        return resolvedURL
+    }
+
+    // MARK: - New Architecture
+
+    private func setupNewArchView(bundleURL: URL?) {
+        #if RCT_NEW_ARCH_ENABLED
+            guard let bundleURL = bundleURL else { return }
+
+            reactNativeDelegate = SDKReactNativeDelegate(bundleURL: bundleURL)
+            
+            // Create the isolated dependency provider here
+            let dependencyProvider = RCTAppDependencyProvider() 
+            
+            // Check your RCTReactNativeFactory init. Some versions allow:
+            // RCTReactNativeFactory(delegate: reactNativeDelegate!, dependencyProvider: dependencyProvider)
+            reactNativeFactory = RCTReactNativeFactory(delegate: reactNativeDelegate!)
+
+        // Catch any ObjC exceptions that escape into C++ territory before they
+        // hit std::terminate inside ObjCTurboModule::performMethodInvocation.
+        // This handler fires on the turbomodulemanager queue, giving us a log
+        // before the process dies.
+            NSSetUncaughtExceptionHandler { exception in
+                NSLog("SDK_DEBUG: *** UNCAUGHT EXCEPTION: %@", exception.name.rawValue)
+                NSLog("SDK_DEBUG: *** REASON: %@", exception.reason ?? "nil")
+                NSLog("SDK_DEBUG: *** CALL STACK:\n%@", exception.callStackSymbols.joined(separator: "\n"))
+            }
+
+            reactNativeDelegate = SDKReactNativeDelegate(bundleURL: bundleURL)
+
+            // CRITICAL: Do NOT set reactNativeDelegate?.dependencyProvider from the
+            // host app's appDelegate. The host has no CodePush TurboModule registered.
+            // Inheriting its provider means every CodePush JS→native call lands on
+            // an uninitialised ObjC object, throws, and kills the process at
+            // RCTTurboModule.mm:360 on com.meta.react.turbomodulemanager.queue.
+            //
+            // SDKReactNativeDelegate.createDependencyProvider() returns a fresh
+            // ReactNativeAppDependencyProvider that is built from this pod's own
+            // auto-linked modules — including CodePush.
+
+            reactNativeFactory = RCTReactNativeFactory(delegate: reactNativeDelegate!)
+
+            let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
+
+            let sdkView = reactNativeFactory!.rootViewFactory.view(
+                withModuleName: "ManageAppSDK",
+                initialProperties: props
+            )
+            sdkView.frame = self.view.bounds
+            sdkView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            self.view = sdkView
+        #endif
+    }
+
+    // MARK: - Old Architecture
+
+    private func setupOldArchView(bundleURL: URL?) {
+        guard let bundleURL = bundleURL else {
+            NSLog("SDK_DEBUG: setupOldArchView — no bundle URL, aborting")
+            return
+        }
+
+        // IMPORTANT: We provide an explicit moduleProvider that includes CodePush.
+        //
+        // Without this, RCTBridge auto-discovers all +load registered modules from
+        // the host app's process — which may include a CodePush instance already
+        // bound to the host's bridge. By supplying our own provider we ensure
+        // CodePush is freshly instantiated and bound exclusively to this bridge.
+        let bridge = RCTBridge(bundleURL: bundleURL, moduleProvider: {
+            return [CodePush()]
+        }, launchOptions: nil)!
+
+        let props: [String: Any] = initialProps.reduce(into: [:]) { $0[$1.key] = $1.value }
+        let rootView = RCTRootView(bridge: bridge, moduleName: "ManageAppSDK", initialProperties: props)
+        rootView.frame = self.view.bounds
+        rootView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        self.view = rootView
+    }
+}
