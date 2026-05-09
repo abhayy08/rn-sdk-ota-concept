@@ -16,13 +16,15 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
-  # sdk.jsbundle and assets are copied directly into the host app's main bundle
-  # so CodePush.bundleURL(forResource:withExtension:) can find them via
-  # [NSBundle mainBundle]. resource_bundles would nest them in a sub-bundle
-  # which CodePush cannot search.
+  # sdk.jsbundle is copied flat into the app's main bundle so CodePush can find
+  # it via [NSBundle mainBundle].
+  # Assets use a resource_bundle named after the assets folder so the directory
+  # structure (assets/images/...) is preserved inside the bundle.
+  # The JS bundle resolves assets relative to its own location — when loaded
+  # from the app bundle, RN looks for assets/ next to the bundle file.
   s.resources = [
     'ios/sdk.jsbundle',
-    'ios/assets/**/*'
+    'ios/assets'
   ]
 
   s.pod_target_xcconfig = {
