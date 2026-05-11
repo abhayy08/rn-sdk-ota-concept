@@ -101,4 +101,21 @@ class ManageAppSDKViewController: UIViewController {
         rootView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         self.view = rootView
     }
+
+    // MARK: - Cleanup
+    // When the VC is dismissed and deallocated, invalidate the React instance.
+    // Next launch creates a fresh one — CodePush.bundleURL() will then return
+    // the newly installed bundle automatically.
+    deinit {
+        #if RCT_NEW_ARCH_ENABLED
+        reactNativeDelegate = nil
+        reactNativeFactory = nil
+        NSLog("SDK_DEBUG: New Arch factory released on deinit")
+        #else
+        if let rootView = self.view as? RCTRootView {
+            rootView.bridge?.invalidate()
+            NSLog("SDK_DEBUG: Old Arch bridge invalidated on deinit")
+        }
+        #endif
+    }
 }

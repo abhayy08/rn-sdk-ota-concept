@@ -176,6 +176,8 @@ class ManageAppSDKActivity : ReactActivity() {
                         if (isNewArchitectureEnabled(context)) {
                             _sdkReactHost?.destroy("Resetting SDK Instance", null)
                             Log.d("SDK_DEBUG", "SDK ReactHost destroyed (New Arch)")
+                            _sdkHost = null
+                            _sdkReactHost = null
                         } else {
                             _sdkHost?.reactInstanceManager?.let {
                                 it.onHostDestroy()
@@ -190,13 +192,13 @@ class ManageAppSDKActivity : ReactActivity() {
                     }
                 }
 
-                if (!isNewArchitectureEnabled(context))
+                // if (!isNewArchitectureEnabled(context))
                     Handler(Looper.getMainLooper()).postDelayed({
                         isResetting = false
                         preloadSDKInstance(context)
                     }, 500)
-                else
-                    isResetting = false
+                // else
+                //     isResetting = false
             }
         }
 
