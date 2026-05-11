@@ -1,5 +1,6 @@
 export type SDKParams = {
   [key: string]: string | boolean | number;
+  environment: "staging" | "production";
 };
 
 /**
